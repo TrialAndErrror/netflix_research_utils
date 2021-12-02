@@ -4,7 +4,7 @@ from src.region_blocks import check_all_region_blocks, process_region_blocks
 from src import DEBUG, MAX_COUNT
 
 
-def process_movie_entry(driver, movie_data, nfid, title):
+def process_movie_entry(driver, movie_data, nfid):
     """
     Process one movie entry
 
@@ -14,11 +14,6 @@ def process_movie_entry(driver, movie_data, nfid, title):
     :param title: str
     :return: None
     """
-
-    """
-    Notify user that the program is still running
-    """
-    print(f'Working on {title}')
 
     """
     Identify url based on netflix id, then load page in Webdriver
@@ -57,12 +52,16 @@ def run_with_limit(nf_dict):
 
     count = 0
     movie_data = {}
-
+    total_count = MAX_COUNT
     """
     Process each movie in the dictionary.
     """
     for title, nfid in nf_dict.items():
-        process_movie_entry(driver, movie_data, nfid, title)
+        """
+        Notify user that the program is still running
+        """
+        print(f'Working on {title}: [{count}/{total_count}]')
+        process_movie_entry(driver, movie_data, nfid)
 
         """
         Count keeps track of number of movies processed.
@@ -98,12 +97,15 @@ def run_all_movies(nf_dict):
     driver.implicitly_wait(2)
 
     movie_data = {}
-
+    count = 1
+    total_count = len(nf_dict)
     """
     Process each movie in the dictionary.
     """
     for title, nfid in nf_dict.items():
-        process_movie_entry(driver, movie_data, nfid, title)
+        print(f'Working on {title}: [{count}/{total_count}]')
+        process_movie_entry(driver, movie_data, nfid)
+        count += 1
 
     """
     Close and quit Webdriver
