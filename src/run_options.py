@@ -1,15 +1,7 @@
 from selenium import webdriver
 
 from src.region_blocks import check_all_region_blocks, process_region_blocks
-
-"""
-Testing Variables:
-
-DEBUG and MAX COUNT are global constants used to limit number of movies to download.
-Set DEBUG to False to allow it to get all movies in the json_file.
-"""
-DEBUG = False
-MAX_COUNT = 100
+from src import DEBUG, MAX_COUNT
 
 
 def process_movie_entry(driver, movie_data, nfid, title):
