@@ -4,7 +4,7 @@ from src.region_blocks import check_all_region_blocks, process_region_blocks
 from src import DEBUG, MAX_COUNT
 
 
-def process_movie_entry(driver, movie_data, nfid):
+def process_movie_entry(driver, movie_data, nfid, title):
     """
     Process one movie entry
 
@@ -61,7 +61,7 @@ def run_with_limit(nf_dict):
         Notify user that the program is still running
         """
         print(f'Working on {title}: [{count}/{total_count}]')
-        process_movie_entry(driver, movie_data, nfid)
+        process_movie_entry(driver, movie_data, nfid, title)
 
         """
         Count keeps track of number of movies processed.
@@ -104,7 +104,7 @@ def run_all_movies(nf_dict):
     """
     for title, nfid in nf_dict.items():
         print(f'Working on {title}: [{count}/{total_count}]')
-        process_movie_entry(driver, movie_data, nfid)
+        process_movie_entry(driver, movie_data, nfid, title)
         count += 1
 
     """
