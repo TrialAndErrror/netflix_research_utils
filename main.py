@@ -1,8 +1,7 @@
 import logging
 
-from src.file_commands import load_from_json_data, save_results
+from src.file_commands import load_from_json_data, save_results, setup_directories
 from src.run_options import DEBUG, run_with_limit, run_all_movies
-
 
 
 """
@@ -37,4 +36,5 @@ def get_subs_and_dubs():
 
 
 if __name__ == '__main__':
+    setup_directories()
     get_subs_and_dubs()

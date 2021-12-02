@@ -4,7 +4,7 @@ from src.region_blocks import check_all_region_blocks, process_region_blocks
 from src import DEBUG, MAX_COUNT
 
 
-def process_movie_entry(driver, movie_data, nfid, title):
+def process_movie_entry(driver: webdriver, movie_data: dict, nfid: str, title: str):
     """
     Process one movie entry
 
@@ -33,7 +33,7 @@ def process_movie_entry(driver, movie_data, nfid, title):
         movie_data[title] = process_region_blocks(driver, region_blocks, title)
 
 
-def run_with_limit(nf_dict):
+def run_with_limit(nf_dict: dict):
     """
     Loop through all NetFlix titles in nf_dict and get subs and dubs.
 
@@ -81,7 +81,7 @@ def run_with_limit(nf_dict):
     return movie_data
 
 
-def run_all_movies(nf_dict):
+def run_all_movies(nf_dict: dict):
     """
     Loop through all NetFlix titles in nf_dict and get subs and dubs.
 

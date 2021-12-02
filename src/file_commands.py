@@ -1,12 +1,17 @@
 import json
-import os
 from pathlib import Path
 import numpy as np
 
-from src import RESULTS_FILENAME
+from src import make_results_filename, INPUT_FOLDER, OUTPUT_FOLDER, PROCESSED_FOLDER
 
 
-def load_from_json_data(filename):
+def setup_directories():
+    INPUT_FOLDER.mkdir(exist_ok=True)
+    OUTPUT_FOLDER.mkdir(exist_ok=True)
+    PROCESSED_FOLDER.mkdir(exist_ok=True)
+
+
+def load_from_json_data(filename: str):
     """
     Load file from JSON data.
 
@@ -20,10 +25,10 @@ def load_from_json_data(filename):
 
     If Option 1 is used, the script will create nf_dict and save it.
 
-    :param filename:
+    :param filename: str
     :return: dict
     """
-    nf_path = Path(os.getcwd(), 'nf_dict.json')
+    nf_path = Path(INPUT_FOLDER, 'nf_dict.json')
 
     """
     If nf_dict doesn't exist, create it
@@ -32,9 +37,8 @@ def load_from_json_data(filename):
         """
         Load from filename provided
         """
-        path = Path(os.getcwd(), filename)
-        with open(path, 'r') as file:
-            json_data = json.load(file)
+        path = Path(INPUT_FOLDER, filename)
+        json_data = read_file(path)
 
         """
         Split into lists of movies, then create dictionary.
@@ -45,19 +49,17 @@ def load_from_json_data(filename):
         """
         Save nf_dict
         """
-        with open(nf_path, 'w+') as file:
-            json.dump(nf_lookup, file)
+        write_file(nf_lookup, nf_path)
 
     """
     Load from nf_dict
     """
-    with open(nf_path, 'r') as file:
-        data = json.load(file)
+    data = read_file(nf_path)
 
     return data
 
 
-def save_results(movie_data):
+def save_results(movie_data: dict):
     """
     Save results to json file.
 
@@ -66,5 +68,15 @@ def save_results(movie_data):
     :param movie_data: dict
     :return: None
     """
-    with open(RESULTS_FILENAME, 'w+') as file:
-        json.dump(movie_data, file)
+    write_file(movie_data, make_results_filename())
+
+
+def read_file(filename: Path):
+    with open(filename, 'r') as file:
+        data = json.load(file)
+    return data
+
+
+def write_file(data: dict, filename: Path):
+    with open(filename, 'w+') as file:
+        json.dump(data, file)

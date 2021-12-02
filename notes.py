@@ -1,1 +1,0 @@
-Mouse = "https://selenium-python.readthedocs.io/api.html?highlight=mouse#selenium.webdriver.common.action_chains.ActionChains.click_and_hold"

@@ -2,7 +2,7 @@ import logging
 
 from selenium.common.exceptions import ElementNotInteractableException, NoSuchElementException
 from selenium.webdriver.common.by import By
-
+from selenium import webdriver
 """
 XPATH Constants:
 
@@ -14,7 +14,7 @@ SUB_LIST_SUFFIX = '/div/div[2]'
 BUTTON_SUFFIX = '/button[1]'
 
 
-def click_more_button(driver, xpath, title):
+def click_more_button(driver: webdriver, xpath: str, title: str):
     """
     Find and click the "more" button for Subbed or Dubbed languages list.
 
@@ -46,7 +46,7 @@ def click_more_button(driver, xpath, title):
         logging.debug(f'Looks like {title} may have limited language availability')
 
 
-def process_region_blocks(driver, region_blocks, title):
+def process_region_blocks(driver: webdriver, region_blocks: list, title: str):
     """
     Process all region blocks for a given movie page
 
@@ -136,7 +136,7 @@ def process_region_blocks(driver, region_blocks, title):
 LANGUAGE_BLOCK_XPATH = "/html/body/div[7]/div[3]/div[5]/div[3]"
 
 
-def check_all_region_blocks(driver):
+def check_all_region_blocks(driver: webdriver):
     """
     Uses the WebDriver to find up to 100 language blocks on a movie's page.
 
