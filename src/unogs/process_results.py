@@ -1,5 +1,5 @@
 from pathlib import Path
-from src.unogs.file_commands import read_file, write_file
+from src.utils import read_file, write_file
 from src.unogs import PROCESSED_FOLDER, OUTPUT_FOLDER, make_processed_filename
 
 

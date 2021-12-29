@@ -58,6 +58,6 @@ Logging allows error messages to be logged along the way.
 """
 logging.basicConfig(
     level=logging.DEBUG,
-    filename='logs.log',
+    filename='unogs_logs.log',
     format='%(asctime)s %(message)s',
 )

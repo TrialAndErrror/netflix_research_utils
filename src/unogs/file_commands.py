@@ -1,8 +1,8 @@
-import json
 from pathlib import Path
 import numpy as np
 import sys
 from src.unogs import make_results_filename, INPUT_FOLDER, OUTPUT_FOLDER, PROCESSED_FOLDER
+from src.utils import read_file, write_file
 
 
 def setup_directories():
@@ -80,15 +80,3 @@ def save_results(movie_data: dict):
     write_file(movie_data, make_results_filename())
 
 
-def read_file(filename: Path):
-    try:
-        with open(filename, 'r') as file:
-            data = json.load(file)
-        return data
-    except FileNotFoundError:
-        return None
-
-
-def write_file(data: dict, filename: Path):
-    with open(filename, 'w+') as file:
-        json.dump(data, file)
