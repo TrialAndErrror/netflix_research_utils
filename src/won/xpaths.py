@@ -28,7 +28,7 @@ def get_title_cell(row_num):
 
 
 def get_netflix_url_cell(row_num):
-    return f'{ENTRY_TABLE}/tr[{row_num + 1}]/td/table/tbody/tr[6]/td[2]'
+    return f'{ENTRY_TABLE}/tr[{row_num + 1}]/td/table/tbody/tr[6]/td[2]/a'
 
 
 """
