@@ -4,9 +4,7 @@ import os
 
 
 """
-Site URL
-
-Not currently used, but helpful for reference.
+Main Site URL
 """
 BASE_URL = "https://www.whats-on-netflix.com/originals/movies/"
 

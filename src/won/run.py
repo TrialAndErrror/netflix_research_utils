@@ -5,7 +5,7 @@ from selenium.common.exceptions import ElementNotInteractableException
 from selenium.webdriver.common.by import By
 
 from src.won.xpaths import NEXT_BUTTON, get_row_xpath, EXPAND_BUTTON_CELL, get_title_cell, get_netflix_url_cell
-from src.won import OUTPUT_FILE
+from src.won import OUTPUT_FILE, BASE_URL
 from src.utils import write_file
 
 
@@ -113,12 +113,28 @@ def get_site_data():
     """
     Fetch all site data from What's On Netflix
     """
+
+    """
+    Setup Webdriver and load base page
+    """
     driver: webdriver = setup_driver()
+    driver.get(BASE_URL)
+
+    """
+    Loop through each page of results and store the data.
+    """
     more_pages: bool = True
     while more_pages:
         expand_all_rows(driver)
         get_all_movies(driver)
         more_pages = turn_page(driver)
 
+    """
+    Close and quit the 
+    """
     driver.close()
     driver.quit()
+
+
+if __name__ == '__main__':
+    get_site_data()
