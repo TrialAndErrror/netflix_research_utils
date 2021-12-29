@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 import numpy as np
-
-from src import make_results_filename, INPUT_FOLDER, OUTPUT_FOLDER, PROCESSED_FOLDER
+import sys
+from src.unogs import make_results_filename, INPUT_FOLDER, OUTPUT_FOLDER, PROCESSED_FOLDER
 
 
 def setup_directories():
@@ -34,29 +34,38 @@ def load_from_json_data(filename: str):
     If nf_dict doesn't exist, create it
     """
     if not nf_path.exists():
-        """
-        Load from filename provided
-        """
-        path = Path(INPUT_FOLDER, filename)
-        json_data = read_file(path)
-
-        """
-        Split into lists of movies, then create dictionary.
-        """
-        all_movies = list(np.concatenate([item['results'] for item in json_data]).flat)
-        nf_lookup = {item['title']: item['nfid'] for item in all_movies}
-
-        """
-        Save nf_dict
-        """
-        write_file(nf_lookup, nf_path)
+        create_nf_data_file(filename, nf_path)
 
     """
     Load from nf_dict
     """
     data = read_file(nf_path)
+    if data:
+        return data
+    else:
+        print(f'Error: File {filename} not found. Place data in the inputs folder: {INPUT_FOLDER}')
+        sys.exit()
 
-    return data
+
+def create_nf_data_file(filename, nf_path):
+    """
+    Load from filename provided
+    """
+    path = Path(INPUT_FOLDER, filename)
+    json_data = read_file(path)
+    if not json_data:
+        print(f'Unable to locate NF Data File; Make sure that you have the data saved as {path}')
+        sys.exit()
+
+    """
+    Split into lists of movies, then create dictionary.
+    """
+    all_movies = list(np.concatenate([item['results'] for item in json_data]).flat)
+    nf_lookup = {item['title']: item['nfid'] for item in all_movies}
+    """
+    Save nf_dict
+    """
+    write_file(nf_lookup, nf_path)
 
 
 def save_results(movie_data: dict):
@@ -72,9 +81,12 @@ def save_results(movie_data: dict):
 
 
 def read_file(filename: Path):
-    with open(filename, 'r') as file:
-        data = json.load(file)
-    return data
+    try:
+        with open(filename, 'r') as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        return None
 
 
 def write_file(data: dict, filename: Path):

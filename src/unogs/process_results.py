@@ -1,6 +1,6 @@
 from pathlib import Path
-from src.file_commands import read_file, write_file
-from src import PROCESSED_FOLDER, OUTPUT_FOLDER, make_processed_filename
+from src.unogs.file_commands import read_file, write_file
+from src.unogs import PROCESSED_FOLDER, OUTPUT_FOLDER, make_processed_filename
 
 
 def add_languages_to_dict(data_dict: dict, title: str, languages: list):
@@ -15,7 +15,7 @@ def add_languages_to_dict(data_dict: dict, title: str, languages: list):
     if len(languages) > 0:
         for language in languages:
 
-            if not language in data_dict:
+            if language not in data_dict:
                 """
                  If the language is not in the data_dict, create an empty list.
                  """
@@ -84,7 +84,6 @@ def sort_by_language(data: dict):
             sub_lang_list = process_languages_str(languages, 'Sub')
             add_languages_to_dict(countries_dict[country]['Sub'], title, sub_lang_list)
 
-
         count += 1
 
     return countries_dict
@@ -94,9 +93,6 @@ def save_results(data: dict):
     """
     Generate filename and save file based on content type.
 
-    content_type should be 'Dub' or 'Sub'.
-
-    :param content_type: str
     :param data: dict
     :return:
     """

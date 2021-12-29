@@ -1,16 +1,15 @@
 from selenium import webdriver
 
-from src.region_blocks import check_all_region_blocks, process_region_blocks
-from src import DEBUG, MAX_COUNT
+from src.unogs.region_blocks import check_all_region_blocks, process_region_blocks
+from src.unogs import DEBUG, MAX_COUNT
 
 
-def process_movie_entry(driver: webdriver, movie_data: dict, nfid: str, title: str):
+def process_movie_entry(driver: webdriver, nfid: str, title: str):
     """
     Process one movie entry
 
     :param driver: Webdriver
-    :param movie_data: dict
-    :param nfid: int
+    :param nfid: str
     :param title: str
     :return: None
     """
@@ -30,7 +29,7 @@ def process_movie_entry(driver: webdriver, movie_data: dict, nfid: str, title: s
     If region blocks found, loop through them and process them.
     """
     if len(region_blocks) > 0:
-        movie_data[title] = process_region_blocks(driver, region_blocks, title)
+        return process_region_blocks(driver, region_blocks, title)
 
 
 def run_with_limit(nf_dict: dict):
@@ -61,8 +60,14 @@ def run_with_limit(nf_dict: dict):
         Notify user that the program is still running
         """
         print(f'Working on {title}: [{count}/{total_count}]')
-        process_movie_entry(driver, movie_data, nfid, title)
 
+        """
+        Process movie entry.
+        If result found, we save it in the movie_data dictionary.
+        """
+        result = process_movie_entry(driver, nfid, title)
+        if result:
+            movie_data[title] = result
         """
         Count keeps track of number of movies processed.
         Set DEBUG to False to allow it to process the entire file.
@@ -104,7 +109,7 @@ def run_all_movies(nf_dict: dict):
     """
     for title, nfid in nf_dict.items():
         print(f'Working on {title}: [{count}/{total_count}]')
-        process_movie_entry(driver, movie_data, nfid, title)
+        process_movie_entry(driver, nfid, title)
         count += 1
 
     """
