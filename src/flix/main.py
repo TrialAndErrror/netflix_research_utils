@@ -20,7 +20,7 @@ def get_movie(title):
         save_pickle(soup_data, slug)
 
 
-def main():
+def flix_main():
     missing_titles = []
 
     for movie in NETFLIX_ORIGINALS:
@@ -32,4 +32,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    flix_main()
