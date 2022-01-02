@@ -7,6 +7,7 @@ from src.flix import PICKLE_DIR
 def check_for_404(soup_data):
     return re.search('Page Not Found', soup_data)
 
+
 def get_pickle_path(filename):
     filename = filename if filename.endswith('.pickle') else f'{filename}.pickle'
     path = Path(PICKLE_DIR, f'{filename}')
