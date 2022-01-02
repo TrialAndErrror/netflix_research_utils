@@ -21,7 +21,7 @@ def check_for_missing_data(obj):
 
 
 def read_soup(filename):
-    title = filename.split('.')[0]
+    title = filename.split('.')[0].split('/')[-1]
     df = None
     obj = load_pickle(Path(PICKLE_DIR, filename))
 
@@ -55,7 +55,7 @@ def make_dfs():
 
         counter += 1
 
-    save_pickle(df_dict, '!!!df_results!!!!')
+    save_pickle(df_dict, '!!!df_results!!!')
     print('\n\nResults saved.\n\n')
 
 
