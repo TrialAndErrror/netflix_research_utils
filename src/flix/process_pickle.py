@@ -16,14 +16,56 @@ def check_for_missing_data(obj):
         content_div = soup.find_all('div', {'class': 'content'})[-1]
     except IndexError:
         return True
+    except TypeError:
+        print_red('Error: Object text might not exist')
+        print(f'Corrupted text: {obj}')
+        return True
     else:
         return re.search('No streaming data', content_div.text)
 
 
-def read_soup(filename):
+def read_info_soup(filename):
     title = filename.split('.')[0].split('/')[-1]
-    df = None
-    obj = load_pickle(Path(PICKLE_DIR, filename))
+    dataframes_dict = None
+    obj: BeautifulSoup = load_pickle(Path(PICKLE_DIR, filename))
+
+    missing_data = check_for_missing_data(obj)
+
+    if not missing_data:
+        netflix_table = obj.select('#netflix')
+        if netflix_table:
+
+            data_dict = {
+                'Recent Netflix': netflix_table,
+            }
+
+            dataframes_dict = {key: pd.read_html(value) for key, value in data_dict.items() if value}
+
+    return title, dataframes_dict
+
+
+def make_history_tables(obj):
+    netflix_overall = obj.select('#toc-netflix-1')
+    netflix_movies = obj.select('#toc-netflix-2')
+    netflix_kids = obj.select('#toc-netflix-40')
+    netflix_official = obj.select('#toc-netflix-40')
+
+    data_dict = {
+        'Overall': netflix_overall,
+        'Movies': netflix_movies,
+        'Kids': netflix_kids,
+        'Official': netflix_official
+    }
+
+    results_dict = {key: pd.read_html(value) for key, value in data_dict.items() if value}
+    if len(results_dict) > 0:
+        return results_dict
+
+
+def read_history_soup(filename):
+    title = filename.split('.')[0].split('/')[-1]
+    dataframes_dict = None
+    obj: BeautifulSoup = load_pickle(Path(PICKLE_DIR, filename))
 
     try:
         missing_data = check_for_missing_data(obj)
@@ -33,9 +75,9 @@ def read_soup(filename):
         missing_data = True
 
     if not missing_data:
-        df = pd.read_html(obj)[-1]
+       dataframes_dict = make_history_tables(obj)
 
-    return title, df
+    return title, dataframes_dict
 
 
 def make_dfs(pickle_dir=PICKLE_DIR):
@@ -44,18 +86,25 @@ def make_dfs(pickle_dir=PICKLE_DIR):
     files_count = len(files)
     counter = 1
 
-    df_dict = {}
+    info_dict = {}
+    history_dict = {}
 
     for file in files:
         print(f'Working on {counter}/{files_count}')
-        title, df = read_soup(file)
+        title, df = read_info_soup(file)
+        title, history_df = read_history_soup(file)
         if isinstance(df, pd.DataFrame):
             print_green(f'Found top 10 data for {title}')
-            df_dict[title] = df
+            info_dict[title] = df
+        if isinstance(history_df, pd.DataFrame):
+            print_green(f'Found History data for {title}')
+            history_dict[title] = history_df
 
         counter += 1
 
-    save_pickle(df_dict, '!!!df_results!!!')
+    save_pickle(info_dict, '!!!info_df_results!!!')
+    save_pickle(history_dict, '!!!history_df_results!!!')
+
     print('\n\nResults saved.\n\n')
 
 
