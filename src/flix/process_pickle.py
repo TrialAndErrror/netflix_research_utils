@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 import glob
-from debug_messages import print_green, print_red
+from src.flix.debug_messages import print_green, print_red
 
 
 def check_for_missing_data(obj):
@@ -38,9 +38,9 @@ def read_soup(filename):
     return title, df
 
 
-def make_dfs():
+def make_dfs(pickle_dir=PICKLE_DIR):
     # files = os.listdir(PICKLE_DIR)
-    files = glob.glob(f'{PICKLE_DIR}/*.pickle')
+    files = glob.glob(f'{pickle_dir}/*.pickle')
     files_count = len(files)
     counter = 1
 

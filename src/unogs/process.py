@@ -1,4 +1,4 @@
-from src.process_results import process_subs_and_dubs, read_file
+from src.unogs.process_results import process_subs_and_dubs, read_file
 from pathlib import Path
 from src import OUTPUT_FOLDER
 
