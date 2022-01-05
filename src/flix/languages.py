@@ -1,26 +1,21 @@
-import time
-import requests
-from requests.exceptions import ConnectionError
-from pathlib import Path
 from slugify import slugify
-
-
-from src.flix import BASE_URL, PICKLE_DIR
-from src.flix.utils import save_pickle, get_pickle_path, check_for_404
+from src.flix.utils import get_pickle_path, check_for_404, save_pickle
+import requests
+import time
+from src.flix.debug_messages import print_connection_error, print_found, print_missing, print_pickle_exists
+from src.flix import BASE_URL
 from src.flix.data import NETFLIX_ORIGINALS
-from src.flix.debug_messages import print_missing, print_found, print_pickle_exists, print_connection_error
-from src.flix.process_pickle import make_dfs
 
 
-def get_movie(title):
+def get_languages(title):
     print(f'Working on {title}')
     slug = slugify(title).replace('/', '')
     print(f'Slug: {slug}')
 
-    pickle_path = get_pickle_path(slug, extra_folder='history')
+    pickle_path = get_pickle_path(slug, extra_folder='language')
     if not pickle_path.exists():
         try:
-            response = requests.get(f'{BASE_URL}/{slug}/top10/')
+            response = requests.get(f'{BASE_URL}/{slug}/streaming/')
         except ConnectionError:
             print_connection_error()
         else:
@@ -33,7 +28,7 @@ def get_movie(title):
                 return slug
             else:
                 print_found()
-                save_pickle(soup_data, slug, extra_folder='history')
+                save_pickle(soup_data, slug, extra_folder='language')
 
             time.sleep(1)
 
@@ -41,16 +36,12 @@ def get_movie(title):
         print_pickle_exists()
 
 
-def flix_history():
+def flix_languages():
     missing_titles = []
 
     for movie in NETFLIX_ORIGINALS:
-        missing = get_movie(movie)
+        missing = get_languages(movie)
 
         if missing:
             missing_titles.append(missing)
             save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
-
-
-if __name__ == '__main__':
-    flix_history()

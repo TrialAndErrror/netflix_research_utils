@@ -79,22 +79,30 @@ def get_history_tables(soup: BeautifulSoup, html_obj):
         return results_list
 
 
-# def read_language_soup(filename):
-#     pickle_path = Path(PICKLE_DIR, 'history', filename)
-#     title = filename.split('.')[0].split('/')[-1]
-#     obj: str = load_pickle(pickle_path)
-#     soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
-#     results = None
-#
-#     try:
-#         missing_data = check_for_missing_data(soup)
-#     except TypeError:
-#         print_red('Error: Object text might not exist')
-#         print(f'Corrupted text: {soup}')
-#         missing_data = True
-#
-#     if not missing_data:
-#         results = get_history_tables(soup, obj)
+def get_languages_list(soup):
+    df = pd.read_html(str(soup))
+    my_list = list(df[0].loc[:, 0])
+    return my_list
+
+
+def read_language_soup(filename):
+    pickle_path = Path(PICKLE_DIR, 'language', filename)
+    title = filename.split('.')[0].split('/')[-1]
+    obj: str = load_pickle(pickle_path)
+    soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
+    # results = None
+    # try:
+    #     missing_data = check_for_missing_data(soup)
+    # except TypeError:
+    #     print_red('Error: Object text might not exist')
+    #     print(f'Corrupted text: {soup}')
+    #     missing_data = True
+
+    # if not missing_data:
+    results = get_languages_list(soup)
+
+    return title, results
+
 
 def read_history_soup(filename):
     pickle_path = Path(PICKLE_DIR, 'history', filename)
@@ -116,8 +124,8 @@ def read_history_soup(filename):
     return title, results
 
 
-def make_info_dfs(pickle_dir):
-    info_files = glob.glob(f'{pickle_dir}/info/*.pickle')
+def make_info_dfs():
+    info_files = glob.glob(f'{PICKLE_DIR}/info/*.pickle')
     files_count = len(info_files)
     counter = 1
 
@@ -128,18 +136,18 @@ def make_info_dfs(pickle_dir):
             print(f'Working on {counter}/{files_count}')
             title, results = read_info_soup(file)
             if isinstance(results, tuple):
-                print_green(f'Found top 10 data for {title}')
+                print_green(f'Found Info data for {title}')
                 info_dict[title] = results
 
         counter += 1
 
-    save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='info')
+    save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='summary')
 
 
-def make_history_dfs(pickle_dir):
+def make_history_dfs():
     print('Working on History')
     history_dict = {}
-    history_files = glob.glob(f'{pickle_dir}/history/*.pickle')
+    history_files = glob.glob(f'{PICKLE_DIR}/history/*.pickle')
     files_count = len(history_files)
     counter = 1
 
@@ -152,40 +160,34 @@ def make_history_dfs(pickle_dir):
                 history_dict[title] = results
 
         counter += 1
-    save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='history')
+    save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='summary')
 
 
-# def make_langauge_dfs(pickle_dir):
-#     print('Working on History')
-#     history_dict = {}
-#     history_files = glob.glob(f'{pickle_dir}/history/*.pickle')
-#     files_count = len(history_files)
-#     counter = 1
-#
-#     for file in history_files:
-#         if not file.split('/')[-1].startswith('!!!'):
-#             print(f'Working on {counter}/{files_count}')
-#             title, results = read_history_soup(file)
-#             if isinstance(results, list):
-#                 print_green(f'Found History data for {title}')
-#                 history_dict[title] = results
-#
-#         counter += 1
-#     save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='history')
+def make_langauge_dfs():
+    print('Working on Languages')
+    language_dict = {}
+    language_files = glob.glob(f'{PICKLE_DIR}/language/*.pickle')
+    files_count = len(language_files)
+    counter = 1
+
+    for file in language_files:
+        if not file.split('/')[-1].startswith('!!!'):
+            print(f'Working on {counter}/{files_count}')
+            title, results = read_history_soup(file)
+            if isinstance(results, list):
+                print_green(f'Found Language data for {title}')
+                language_dict[title] = results
+
+        counter += 1
+    save_pickle(language_dict, '!!!language_df_results!!!', extra_folder='summary')
 
 
-def make_dfs(pickle_dir=PICKLE_DIR):
-    make_info_dfs(pickle_dir)
-    make_history_dfs(pickle_dir)
+def make_dfs():
+    make_info_dfs()
+    make_history_dfs()
+    make_langauge_dfs()
 
     print('\n\nResults saved.\n\n')
-
-
-def test_debug():
-    pass
-    # top_10_filename = 'red-notice.pickle'
-    # no_results_filename = 'quincy.pickle'
-    # read_soup(no_results_filename)
 
 
 if __name__ == '__main__':

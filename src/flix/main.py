@@ -10,6 +10,8 @@ from pathlib import Path
 from src.flix.debug_messages import print_missing, print_found, print_pickle_exists, print_connection_error
 from requests.exceptions import ConnectionError
 from src.flix.history import flix_history
+from src.flix.languages import flix_languages
+from src.flix.process_pickle import make_dfs
 
 
 def get_movie(title):
@@ -49,21 +51,24 @@ def flix_main():
 
         if missing:
             missing_titles.append(missing)
-            save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='info')
+            save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
 
 
 def run_all():
     print('making directories')
-    history_dir = Path(PICKLE_DIR, 'history')
-    info_dir = Path(PICKLE_DIR, 'info')
+    directories = ['history', 'info', 'summary', 'language']
 
-    os.makedirs(history_dir, exist_ok=True)
-    os.makedirs(info_dir, exist_ok=True)
+    for dir in directories:
+        os.makedirs(dir, exist_ok=True)
 
     print('fetching movie info')
     flix_main()
     print('fetching movie history')
     flix_history()
+    print('fetching movie languages')
+    flix_languages()
+
+    make_dfs()
 
 
 if __name__ == '__main__':
