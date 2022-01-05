@@ -49,10 +49,10 @@ def flix_history():
 
         if missing:
             missing_titles.append(missing)
-            save_pickle(missing_titles, '!!!missing_titles!!!')
+            save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='history')
 
-    pickle_history_dir = Path(PICKLE_DIR, 'history')
-    make_dfs(pickle_history_dir)
+    # pickle_history_dir = Path(PICKLE_DIR, 'history')
+    make_dfs()
 
 
 if __name__ == '__main__':

@@ -10,108 +10,182 @@ import glob
 from src.flix.debug_messages import print_green, print_red
 
 
-def check_for_missing_data(obj):
-    soup = BeautifulSoup(obj, "lxml")
+def check_for_missing_data(soup: BeautifulSoup):
+    # soup = BeautifulSoup(obj, "lxml")
     try:
         content_div = soup.find_all('div', {'class': 'content'})[-1]
     except IndexError:
         return True
     except TypeError:
         print_red('Error: Object text might not exist')
-        print(f'Corrupted text: {obj}')
+        print(f'Corrupted text: {soup}')
         return True
     else:
         return re.search('No streaming data', content_div.text)
 
 
 def read_info_soup(filename):
+    pickle_path = Path(PICKLE_DIR, 'info', filename)
     title = filename.split('.')[0].split('/')[-1]
     dataframes_dict = None
-    obj: BeautifulSoup = load_pickle(Path(PICKLE_DIR, filename))
+    obj: str = load_pickle(pickle_path)
+    if not isinstance(obj, str):
+        print('here')
+    soup = BeautifulSoup(obj, features='lxml')
 
-    missing_data = check_for_missing_data(obj)
+    results = None
+    missing_data = check_for_missing_data(soup)
 
     if not missing_data:
-        netflix_table = obj.select('#netflix')
+        obj_soup = BeautifulSoup(obj, features='lxml')
+        netflix_table = obj_soup.find(id='netflix')
         if netflix_table:
+            html_snippet = str(netflix_table)
+            data = pd.read_html(html_snippet)
+            results = ('Netflix Info', data)
 
-            data_dict = {
-                'Recent Netflix': netflix_table,
-            }
-
-            dataframes_dict = {key: pd.read_html(value) for key, value in data_dict.items() if value}
-
-    return title, dataframes_dict
+    return title, results
 
 
-def make_history_tables(obj):
-    netflix_overall = obj.select('#toc-netflix-1')
-    netflix_movies = obj.select('#toc-netflix-2')
-    netflix_kids = obj.select('#toc-netflix-40')
-    netflix_official = obj.select('#toc-netflix-40')
+def get_history_tables(soup: BeautifulSoup, html_obj):
+    results_list = []
 
-    data_dict = {
-        'Overall': netflix_overall,
-        'Movies': netflix_movies,
-        'Kids': netflix_kids,
-        'Official': netflix_official
-    }
+    netflix_overall = soup.find(id='toc-netflix-1')
+    netflix_movies = soup.select('#toc-netflix-2')
+    netflix_kids = soup.select('#toc-netflix-40')
+    netflix_official = soup.select('#toc-netflix-official')
 
-    results_dict = {key: pd.read_html(value) for key, value in data_dict.items() if value}
-    if len(results_dict) > 0:
-        return results_dict
+    if netflix_overall:
+        html_snippet = str(netflix_overall)
+        data = pd.read_html(html_snippet)
+        results_list.append(('Netflix Overall', data))
 
+    if netflix_movies:
+        html_snippet = str(netflix_movies)
+        data = pd.read_html(html_snippet)
+        results_list.append(('Netflix Movies', data))
+
+    if netflix_kids:
+        html_snippet = str(netflix_kids)
+        data = pd.read_html(html_snippet)
+        results_list.append(('Netflix Kids', data))
+
+    if netflix_official:
+        html_snippet = str(netflix_official)
+        data = pd.read_html(html_snippet)
+        results_list.append(('Netflix Official', data))
+
+    if len(results_list) > 0:
+        return results_list
+
+
+# def read_language_soup(filename):
+#     pickle_path = Path(PICKLE_DIR, 'history', filename)
+#     title = filename.split('.')[0].split('/')[-1]
+#     obj: str = load_pickle(pickle_path)
+#     soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
+#     results = None
+#
+#     try:
+#         missing_data = check_for_missing_data(soup)
+#     except TypeError:
+#         print_red('Error: Object text might not exist')
+#         print(f'Corrupted text: {soup}')
+#         missing_data = True
+#
+#     if not missing_data:
+#         results = get_history_tables(soup, obj)
 
 def read_history_soup(filename):
+    pickle_path = Path(PICKLE_DIR, 'history', filename)
     title = filename.split('.')[0].split('/')[-1]
-    dataframes_dict = None
-    obj: BeautifulSoup = load_pickle(Path(PICKLE_DIR, filename))
+    obj: str = load_pickle(pickle_path)
+    soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
+    results = None
 
     try:
-        missing_data = check_for_missing_data(obj)
+        missing_data = check_for_missing_data(soup)
     except TypeError:
         print_red('Error: Object text might not exist')
-        print(f'Corrupted text: {obj}')
+        print(f'Corrupted text: {soup}')
         missing_data = True
 
     if not missing_data:
-       dataframes_dict = make_history_tables(obj)
+        results = get_history_tables(soup, obj)
 
-    return title, dataframes_dict
+    return title, results
 
 
-def make_dfs(pickle_dir=PICKLE_DIR):
-    # files = os.listdir(PICKLE_DIR)
-    files = glob.glob(f'{pickle_dir}/*.pickle')
-    files_count = len(files)
+def make_info_dfs(pickle_dir):
+    info_files = glob.glob(f'{pickle_dir}/info/*.pickle')
+    files_count = len(info_files)
     counter = 1
 
     info_dict = {}
-    history_dict = {}
 
-    for file in files:
-        print(f'Working on {counter}/{files_count}')
-        title, df = read_info_soup(file)
-        title, history_df = read_history_soup(file)
-        if isinstance(df, pd.DataFrame):
-            print_green(f'Found top 10 data for {title}')
-            info_dict[title] = df
-        if isinstance(history_df, pd.DataFrame):
-            print_green(f'Found History data for {title}')
-            history_dict[title] = history_df
+    for file in info_files:
+        if not file.split('/')[-1].startswith('!!!'):
+            print(f'Working on {counter}/{files_count}')
+            title, results = read_info_soup(file)
+            if isinstance(results, tuple):
+                print_green(f'Found top 10 data for {title}')
+                info_dict[title] = results
 
         counter += 1
 
-    save_pickle(info_dict, '!!!info_df_results!!!')
-    save_pickle(history_dict, '!!!history_df_results!!!')
+    save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='info')
+
+
+def make_history_dfs(pickle_dir):
+    print('Working on History')
+    history_dict = {}
+    history_files = glob.glob(f'{pickle_dir}/history/*.pickle')
+    files_count = len(history_files)
+    counter = 1
+
+    for file in history_files:
+        if not file.split('/')[-1].startswith('!!!'):
+            print(f'Working on {counter}/{files_count}')
+            title, results = read_history_soup(file)
+            if isinstance(results, list):
+                print_green(f'Found History data for {title}')
+                history_dict[title] = results
+
+        counter += 1
+    save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='history')
+
+
+# def make_langauge_dfs(pickle_dir):
+#     print('Working on History')
+#     history_dict = {}
+#     history_files = glob.glob(f'{pickle_dir}/history/*.pickle')
+#     files_count = len(history_files)
+#     counter = 1
+#
+#     for file in history_files:
+#         if not file.split('/')[-1].startswith('!!!'):
+#             print(f'Working on {counter}/{files_count}')
+#             title, results = read_history_soup(file)
+#             if isinstance(results, list):
+#                 print_green(f'Found History data for {title}')
+#                 history_dict[title] = results
+#
+#         counter += 1
+#     save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='history')
+
+
+def make_dfs(pickle_dir=PICKLE_DIR):
+    make_info_dfs(pickle_dir)
+    make_history_dfs(pickle_dir)
 
     print('\n\nResults saved.\n\n')
 
 
 def test_debug():
-    top_10_filename = 'red-notice.pickle'
-    no_results_filename = 'quincy.pickle'
-    read_soup(no_results_filename)
+    pass
+    # top_10_filename = 'red-notice.pickle'
+    # no_results_filename = 'quincy.pickle'
+    # read_soup(no_results_filename)
 
 
 if __name__ == '__main__':
