@@ -1,4 +1,5 @@
 from colorama import Fore, Back, Style
+import logging
 
 
 def print_found():
@@ -11,6 +12,7 @@ def print_missing():
 
 def print_connection_error():
     print_red('Connection Error; Skipping Title')
+    logging.error('Connection Error; Skipping Title')
 
 
 def print_pickle_exists():

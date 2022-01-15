@@ -80,9 +80,13 @@ def get_history_tables(soup: BeautifulSoup, html_obj):
 
 
 def get_languages_list(soup):
-    df = pd.read_html(str(soup))
-    my_list = list(df[0].loc[:, 0])
-    return my_list
+    try:
+        df = pd.read_html(str(soup))
+    except ValueError:
+        print_red('No tables found')
+    else:
+        my_list = list(df[0].loc[:, 0])
+        return my_list
 
 
 def read_language_soup(filename):
@@ -91,6 +95,7 @@ def read_language_soup(filename):
     obj: str = load_pickle(pickle_path)
     soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
     netflix_table = soup.find(id='toc-netflix')
+    results = None
 
     # results = None
     # try:
@@ -166,10 +171,10 @@ def make_history_dfs():
     save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='summary')
 
 
-def make_langauge_dfs():
+def make_langauge_dfs(dir=PICKLE_DIR):
     print('Working on Languages')
     language_dict = {}
-    language_files = glob.glob(f'{PICKLE_DIR}/language/*.pickle')
+    language_files = glob.glob(f'{dir}/language/*.pickle')
     files_count = len(language_files)
     counter = 1
 
@@ -186,11 +191,16 @@ def make_langauge_dfs():
 
 
 def make_dfs():
-    make_info_dfs()
-    make_history_dfs()
+    # make_info_dfs()
+    # make_history_dfs()
     make_langauge_dfs()
 
     print('\n\nResults saved.\n\n')
+
+
+def debug_lang_df():
+    dir = Path(os.getcwd(), 'src', 'flix', 'pickle_jar')
+    make_langauge_dfs(dir)
 
 
 if __name__ == '__main__':

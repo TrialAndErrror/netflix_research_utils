@@ -22,7 +22,7 @@ def get_pickle_path(filename, extra_folder: str = None):
 def save_pickle(data, filename: str, extra_folder: str = None):
     path = get_pickle_path(filename, extra_folder)
 
-    with open(path, 'wb') as file:
+    with open(path, 'w+b') as file:
         pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 

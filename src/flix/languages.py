@@ -5,9 +5,12 @@ import time
 from src.flix.debug_messages import print_connection_error, print_found, print_missing, print_pickle_exists
 from src.flix import BASE_URL
 from src.flix.data import NETFLIX_ORIGINALS
+from http.client import RemoteDisconnected
+from ssl import SSLEOFError
 
 
 def get_languages(title):
+    s = requests.session()
     print(f'Working on {title}')
     slug = slugify(title).replace('/', '')
     print(f'Slug: {slug}')
@@ -15,8 +18,12 @@ def get_languages(title):
     pickle_path = get_pickle_path(slug, extra_folder='language')
     if not pickle_path.exists():
         try:
-            response = requests.get(f'{BASE_URL}/{slug}/streaming/')
+            response = s.get(f'{BASE_URL}{slug}/streaming/')
         except ConnectionError:
+            print_connection_error()
+        except RemoteDisconnected:
+            print_connection_error()
+        except SSLEOFError:
             print_connection_error()
         else:
             soup_data = response.text
