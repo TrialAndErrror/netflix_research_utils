@@ -90,6 +90,8 @@ def read_language_soup(filename):
     title = filename.split('.')[0].split('/')[-1]
     obj: str = load_pickle(pickle_path)
     soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
+    netflix_table = soup.find(id='toc-netflix')
+
     # results = None
     # try:
     #     missing_data = check_for_missing_data(soup)
@@ -99,7 +101,8 @@ def read_language_soup(filename):
     #     missing_data = True
 
     # if not missing_data:
-    results = get_languages_list(soup)
+    if netflix_table:
+        results = get_languages_list(netflix_table)
 
     return title, results
 
@@ -173,7 +176,7 @@ def make_langauge_dfs():
     for file in language_files:
         if not file.split('/')[-1].startswith('!!!'):
             print(f'Working on {counter}/{files_count}')
-            title, results = read_history_soup(file)
+            title, results = read_language_soup(file)
             if isinstance(results, list):
                 print_green(f'Found Language data for {title}')
                 language_dict[title] = results
