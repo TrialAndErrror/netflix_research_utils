@@ -2,6 +2,8 @@ from selenium import webdriver
 
 from src.unogs.region_blocks import check_all_region_blocks, process_region_blocks
 from src.unogs import DEBUG, MAX_COUNT
+from src.unogs.file_commands import load_pickle, save_pickle
+from slugify import slugify
 
 
 def process_movie_entry(driver: webdriver, nfid: str, title: str):
@@ -29,7 +31,15 @@ def process_movie_entry(driver: webdriver, nfid: str, title: str):
     If region blocks found, loop through them and process them.
     """
     if len(region_blocks) > 0:
-        return process_region_blocks(driver, region_blocks, title)
+        data = {
+            'nfid': nfid,
+            'title': title,
+        }
+        languages = process_region_blocks(driver, region_blocks, title)
+        data['languages'] = languages
+        save_pickle(data, f'{slugify(title)}.pickle')
+
+        return languages
 
 
 def run_with_limit(nf_dict: dict):
@@ -62,10 +72,21 @@ def run_with_limit(nf_dict: dict):
         print(f'Working on {title}: [{count}/{total_count}]')
 
         """
+        Try to load data from pickle.
+        If pickle doesn't exist, then we process the movie entry
+        """
+
+        try:
+            data = load_pickle(f'{slugify(title)}.pickle')
+        except FileNotFoundError:
+            result = process_movie_entry(driver, nfid, title)
+        else:
+            result = data.get('languages')
+
+        """
         Process movie entry.
         If result found, we save it in the movie_data dictionary.
         """
-        result = process_movie_entry(driver, nfid, title)
         if result:
             movie_data[title] = result
         """
@@ -109,7 +130,21 @@ def run_all_movies(nf_dict: dict):
     """
     for title, nfid in nf_dict.items():
         print(f'Working on {title}: [{count}/{total_count}]')
-        process_movie_entry(driver, nfid, title)
+
+        try:
+            data = load_pickle(f'{slugify(title)}.pickle')
+        except FileNotFoundError:
+            result = process_movie_entry(driver, nfid, title)
+        else:
+            result = data.get('languages')
+
+        """
+        Process movie entry.
+        If result found, we save it in the movie_data dictionary.
+        """
+        if result:
+            movie_data[title] = result
+
         count += 1
 
     """

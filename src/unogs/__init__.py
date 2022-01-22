@@ -13,7 +13,7 @@ DEBUG and MAX COUNT are global constants used to limit number of movies to downl
 Set DEBUG to False to allow it to get all movies in the json_file.
 """
 
-DEBUG = True
+DEBUG = False
 MAX_COUNT = 500
 
 """

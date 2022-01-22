@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from src.utils import read_file, write_file
 from src.unogs import PROCESSED_FOLDER, OUTPUT_FOLDER, make_processed_filename
@@ -119,7 +120,56 @@ def process_subs_and_dubs(results_filename):
     """
     save_results(countries_dict)
 
+    return data, countries_dict
+
+
+def format_by_country(all_results):
+    total_dict = {}
+
+    for results_dict in all_results:
+        for country, c_value in results_dict.items():
+
+            if not country in total_dict:
+                total_dict[country] = {}
+
+            for sub_or_dub, s_value in c_value.items():
+                if not sub_or_dub in total_dict[country]:
+                    total_dict[country][sub_or_dub] = {}
+
+                for language, l_value in s_value.items():
+                    if not language in total_dict[country][sub_or_dub]:
+                        total_dict[country][sub_or_dub][language] = []
+                    total_dict[country][sub_or_dub][language].extend(l_value)
+
+    return total_dict
+
+
+def save_country_dicts(total_dict):
+    countries_path = Path(PROCESSED_FOLDER, 'results_by_country')
+    countries_path.mkdir(exist_ok=True)
+    for key, country_dict in total_dict.items():
+        out_file = Path(countries_path, f'{key}.json')
+        write_file(country_dict, out_file)
+
 
 if __name__ == '__main__':
-    test_file = 'results_12-02-2021_11-15-52.json'
-    process_subs_and_dubs(test_file)
+    results_dir = Path(OUTPUT_FOLDER)
+    files_list = [item for item in os.listdir(results_dir) if item.endswith('.json')]
+    all_results = []
+    movie_by_title_dict = {}
+
+    for file in files_list:
+        data, new_dict = process_subs_and_dubs(file)
+        movie_by_title_dict.update(data)
+        if new_dict:
+            all_results.append(new_dict)
+
+    out_file = Path(PROCESSED_FOLDER, 'total_results_by_title.json')
+    write_file(movie_by_title_dict, out_file)
+
+    total_dict = format_by_country(all_results)
+
+    out_file = Path(PROCESSED_FOLDER, 'total_results_by_country.json')
+    write_file(total_dict, out_file)
+
+    save_country_dicts(total_dict)
