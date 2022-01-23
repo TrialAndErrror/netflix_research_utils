@@ -45,10 +45,22 @@ class PickleReader:
             self.original_language = get_original_language(self.dub_language_dict)
 
     def save_data(self):
+        """
+        Save data back to original pickle path.
+
+        :return: None
+        """
         with open(self.path, 'w+b') as file:
             pickle.dump(self.data, file)
 
     def make_dataframe_entries(self, columns: list[str]) -> list:
+        """
+        Iterate over language_data to find language that match columns provided.
+        Creates list of dictionaries that can be used as an entry for a DataFrame.
+
+        :param columns: list
+        :return: list
+        """
         entry_list = []
         sub_columns = [item for item in columns if item.startswith('sub_')]
         dub_columns = [item for item in columns if item.startswith('dub_')]
@@ -121,6 +133,15 @@ def check_for_languages(data_dict: dict) -> dict:
 
 
 def split_subs_and_dubs(data_dict: dict, lang_type: str) -> dict:
+    """
+    Filter languages in dictionary by lang_type
+
+    :param data_dict: dict
+    :param lang_type: str
+
+    :return: dict
+    """
+
     results = {}
     for country, data in data_dict.items():
         results[country] = data[lang_type]
@@ -128,6 +149,15 @@ def split_subs_and_dubs(data_dict: dict, lang_type: str) -> dict:
 
 
 def get_original_language(dub_dict):
+    """
+    Iterate over dubbing dictionary until original language is found.
+
+    Returns None if no original language is found.
+
+    :param dub_dict: dict
+
+:   :return: str or None
+    """
     for country, lang_list in dub_dict.items():
         for entry in lang_list:
             if entry.strip().endswith('[Original]'):
