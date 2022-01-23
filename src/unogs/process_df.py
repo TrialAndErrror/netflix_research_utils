@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from pathlib import Path
 from src.utils import read_file
+# from slugify import slugify
 
 
 def make_language_header(prefix: str, language: str):
@@ -64,28 +65,47 @@ def get_lang_headers(country_dicts):
 def read_files():
     data_folder = Path(os.getcwd(), 'df_source_data')
     master_json = Path(data_folder, 'total_results_by_title.json')
-    country_files = os.listdir(Path(data_folder, 'results_by_country'))
+    # country_files = os.listdir(Path(data_folder, 'results_by_country'))
 
     master_dict = read_file(master_json)
     master_country_dict = read_file(Path(data_folder, 'total_results_by_country.json'))
 
-    return country_files, master_dict, master_country_dict
+    return master_dict, master_country_dict
 
 
 def main():
-
-    country_files, master_dict, master_country_dict = read_files()
-    dub_languages, sub_langauges = get_lang_headers(master_country_dict)
+    print('Working...')
+    master_dict, master_country_dict = read_files()
+    dub_languages, sub_languages = get_lang_headers(master_country_dict)
 
     country_dfs = {}
-    country_datas = {}
 
-    for country, data in country_datas.items():
-        country_dfs[country] = pd.DataFrame.from_records(data, columns=dub_languages+sub_langauges).fillna(False)
+    movie_titles = list(master_dict.keys())
+
+    for title in movie_titles:
+        print(f'Working on {title}')
+        for country, data in master_dict[title].items():
+            if not country_dfs.get(country):
+                country_dfs[country] = []
+
+            entry = {'title': title}
+            for sub_or_dub, c_data in data.items():
+                language_list = [f'{sub_or_dub.lower()}_{item}' for item in c_data.split(',')]
+
+                for language in dub_languages + sub_languages:
+                    entry.update({
+                        language: bool(language in language_list)
+                    })
+            country_dfs[country].append(entry)
+
+    country_df_dir = Path(os.getcwd(), 'country_dfs')
+    title_df_dir = Path(os.getcwd(), 'title_dfs')
+    country_df_dir.mkdir(exist_ok=True)
+    title_df_dir.mkdir(exist_ok=True)
 
     value: pd.DataFrame
-    for key, value in country_dfs:
-        value.to_csv(f'{key}.csv')
+    for key, value in country_dfs.items():
+        pd.DataFrame.from_records(value).to_csv(Path(country_df_dir, f'{key}.csv'))
 
 
 if __name__ == '__main__':
