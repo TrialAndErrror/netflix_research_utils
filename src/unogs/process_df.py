@@ -1,4 +1,5 @@
 import os
+import re
 
 import pandas as pd
 from pathlib import Path
@@ -73,7 +74,7 @@ def read_files():
     return master_dict, master_country_dict
 
 
-def main():
+def process_into_country_dfs():
     print('Working...')
     master_dict, master_country_dict = read_files()
     dub_languages, sub_languages = get_lang_headers(master_country_dict)
@@ -81,9 +82,10 @@ def main():
     country_dfs = {}
 
     movie_titles = list(master_dict.keys())
-
+    total_count = len(movie_titles)
+    count = 1
     for title in movie_titles:
-        print(f'Working on {title}')
+        print(f'({count}/{total_count}) Working on {title}')
         for country, data in master_dict[title].items():
             if not country_dfs.get(country):
                 country_dfs[country] = []
@@ -96,7 +98,27 @@ def main():
                     entry.update({
                         language: bool(language in language_list)
                     })
+
+                orig_languages = [lang.split('_', maxsplit=1)[1].split('[')[-2].strip() for lang in language_list if lang.strip().endswith('[Original]')]
+                if 2 > len(orig_languages) > 0:
+                    entry.update({
+                        'Original Language': orig_languages[0]
+                    })
+                elif len(orig_languages) >= 2:
+                    print('Found multiple Original Languages:')
+                    for language in orig_languages:
+                        print(language)
+                    print(f'Using {orig_languages[0]}')
+                    entry.update({
+                        'Original Language': orig_languages[0]
+                    })
+                elif len(orig_languages) < 1:
+                    entry.update({
+                        'Original Language': 'Unknown'
+                    })
+
             country_dfs[country].append(entry)
+            count += 1
 
     country_df_dir = Path(os.getcwd(), 'country_dfs')
     title_df_dir = Path(os.getcwd(), 'title_dfs')
@@ -105,9 +127,10 @@ def main():
 
     value: pd.DataFrame
     for key, value in country_dfs.items():
+        print(f'Saving Dataframe: {key}.csv')
         pd.DataFrame.from_records(value).to_csv(Path(country_df_dir, f'{key}.csv'))
 
 
 if __name__ == '__main__':
-    main()
+    process_into_country_dfs()
 

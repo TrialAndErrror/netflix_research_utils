@@ -40,6 +40,10 @@ def process_movie_entry(driver: webdriver, nfid: str, title: str):
         save_pickle(data, f'{slugify(title)}.pickle')
 
         return languages
+    else:
+        data = None
+        save_pickle(data, f'{slugify(title)}.pickle')
+        return None
 
 
 def run_with_limit(nf_dict: dict):

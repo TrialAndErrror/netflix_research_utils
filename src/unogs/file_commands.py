@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import numpy as np
 import sys
@@ -79,7 +80,7 @@ def save_results(movie_data: dict):
     :param movie_data: dict
     :return: None
     """
-    write_file(movie_data, make_results_filename())
+    write_file(movie_data, Path(OUTPUT_FOLDER, make_results_filename()))
 
 
 def save_pickle(data, filename: str):

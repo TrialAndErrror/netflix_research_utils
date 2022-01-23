@@ -152,17 +152,22 @@ def save_country_dicts(total_dict):
         write_file(country_dict, out_file)
 
 
-if __name__ == '__main__':
+def process_into_country_dicts():
     results_dir = Path(OUTPUT_FOLDER)
     files_list = [item for item in os.listdir(results_dir) if item.endswith('.json')]
     all_results = []
     movie_by_title_dict = {}
+
+    all_movies = []
 
     for file in files_list:
         data, new_dict = process_subs_and_dubs(file)
         movie_by_title_dict.update(data)
         if new_dict:
             all_results.append(new_dict)
+        all_movies.extend(list(data.keys()))
+
+    print(f'Total movies found: {len(set(all_movies))}')
 
     out_file = Path(PROCESSED_FOLDER, 'total_results_by_title.json')
     write_file(movie_by_title_dict, out_file)
@@ -173,3 +178,7 @@ if __name__ == '__main__':
     write_file(total_dict, out_file)
 
     save_country_dicts(total_dict)
+
+
+if __name__ == '__main__':
+    process_into_country_dicts()
