@@ -7,7 +7,7 @@ from datetime import datetime
 from src.pickle_farm import LANGUAGE_COLUMNS, PICKLES_DIR
 
 
-def run_all_pickles(pickle_dir: str = PICKLES_DIR):
+def run_all_pickles(pickle_dir: Path or str = PICKLES_DIR):
     """
     Process all pickles and save as dataframes.
 

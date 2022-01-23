@@ -71,16 +71,16 @@ def create_nf_data_file(filename, nf_path):
     write_file(nf_lookup, nf_path)
 
 
-def save_results(movie_data: dict):
-    """
-    Save results to json file.
-
-    Filename is provided by global RESULTS_FILENAME constant.
-
-    :param movie_data: dict
-    :return: None
-    """
-    write_file(movie_data, Path(OUTPUT_FOLDER, make_results_filename()))
+# def save_results(movie_data: dict):
+#     """
+#     Save results to json file.
+#
+#     Filename is provided by global RESULTS_FILENAME constant.
+#
+#     :param movie_data: dict
+#     :return: None
+#     """
+#     write_file(movie_data, Path(OUTPUT_FOLDER, make_results_filename()))
 
 
 def save_pickle(data, filename: str):
