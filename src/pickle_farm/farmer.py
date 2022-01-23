@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 from src.pickle_farm.models import PickleReader
 from datetime import datetime
-from src.pickle_farm import LANGUAGE_COLUMNS, PICKLES_DIR
+from src.pickle_farm import LANGUAGE_COLUMNS, PICKLES_DIR, LANG_REPLACEMENTS, ENABLE_REPLACEMENTS
 
 
 def run_all_pickles(pickle_dir: Path or str = PICKLES_DIR):
@@ -113,12 +113,23 @@ def process_pickles_into_df(all_pickles):
     """
     Create PickleReader object for each pickle;
     append the dataframe entries to the all_entries list.
-    
-    If there is no title, that means there is no data, and so add to errors list.
     """
     for pickle in all_pickles:
         obj = PickleReader(pickle)
+
+        """
+        Check to see if object has a title;
+        If there is no title, that means there is no data, and so add to errors list.
+        """
+        
         if obj.title:
+            """
+            If replacements are enabled, make them now before making dataframe entries.
+            """
+            if ENABLE_REPLACEMENTS:
+                for key, value in LANG_REPLACEMENTS.items():
+                    obj.replace_language(key, value)
+
             all_entries.extend(obj.make_dataframe_entries(LANGUAGE_COLUMNS))
         else:
             error_list.append(str(pickle).split('/')[-1].split('.')[-2])

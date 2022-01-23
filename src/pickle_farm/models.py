@@ -39,10 +39,17 @@ class PickleReader:
 
             self.language_data = check_for_languages(data['languages'])
 
-            self.sub_language_dict = split_subs_and_dubs(self.language_data, 'Sub')
-            self.dub_language_dict = split_subs_and_dubs(self.language_data, 'Dub')
+            self.make_sub_and_dub_dicts()
 
             self.original_language = get_original_language(self.dub_language_dict)
+
+    def replace_language(self, old_lang, new_lang):
+        new_dict = {country: {sub_or_dub: [item.replace(old_lang, new_lang) for item in s_data] for (sub_or_dub, s_data) in c_data.items()} for (country, c_data) in self.language_data.items()}
+        self.language_data = new_dict
+
+    def make_sub_and_dub_dicts(self):
+        self.sub_language_dict = split_subs_and_dubs(self.language_data, 'Sub')
+        self.dub_language_dict = split_subs_and_dubs(self.language_data, 'Dub')
 
     def save_data(self):
         """

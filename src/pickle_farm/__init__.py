@@ -1,5 +1,9 @@
 PICKLES_DIR = '/home/wade/PycharmProjects/chetflix/src/pickle_farm/data_backups/pickles'
 
+ENABLE_REPLACEMENTS = False
+
+LANG_REPLACEMENTS = {}
+
 LANGUAGE_COLUMNS = [
     'dub_Arabic (Egypt) - Audio Description',
     'dub_Italian - Audio Description',
