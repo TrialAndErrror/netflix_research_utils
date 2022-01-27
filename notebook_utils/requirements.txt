@@ -1,0 +1,6 @@
+statsmodels
+bioinfokit
+pandas
+dataframe-image
+seaborn
+jupyter
