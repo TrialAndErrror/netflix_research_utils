@@ -50,7 +50,7 @@ def test_shapiro_wilk(res):
     }
 
 
-class NewAnovaAnalysis:
+class AnovaAnalysis:
     def __init__(self, df_csv, country, anova_model=ANOVA_MODEL):
         self.res = stat()
         self.dataframe: pd.DataFrame = self.load_and_process_df(df_csv)
