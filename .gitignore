@@ -1,4 +1,9 @@
 *.log
 **/*.pickle
+**/*.json
+**/*.csv
+**/*.xml
+
+
 
 /src/flix/pickle_jar/
