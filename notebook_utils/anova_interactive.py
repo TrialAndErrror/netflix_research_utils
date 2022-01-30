@@ -27,7 +27,7 @@ def get_anova_loop() -> str:
             return anova_model
 
 
-def get_df_file_loop() -> Path:
+def get_df_file_loop() -> Path or list:
     df_loop = True
     while df_loop:
         csv_files = [item for item in os.listdir(os.getcwd()) if item.endswith('.csv')]
@@ -41,6 +41,8 @@ def get_df_file_loop() -> Path:
             result = Path(files.get(df_path))
             print(f'Loading {result.absolute()}\n')
             return result
+        # elif df_path == '*' and len(files) > 0:
+        #     return files.values()
         else:
             result = Path(df_path)
             if not result.exists():
@@ -50,7 +52,7 @@ def get_df_file_loop() -> Path:
                 return result
 
 
-def get_country_loop(df: pd.DataFrame) -> str:
+def get_country_loop(df: pd.DataFrame) -> str or list:
     countries = list(df.country.unique())
     df_loop = True
     while df_loop:
@@ -63,6 +65,8 @@ def get_country_loop(df: pd.DataFrame) -> str:
         if dict_result:
             print(f'Using {dict_result} for analysis.\n')
             return dict_result
+        elif country == '*':
+            return country_dict.values()
         else:
             if country not in countries:
                 country = country.capitalize()
@@ -84,8 +88,13 @@ def anova_interactive():
         df_path = get_df_file_loop()
         country = get_country_loop(pd.read_csv(df_path))
 
-        current_analysis = AnovaAnalysis(df_path, country, anova_model)
-        current_analysis.run_analysis()
+        if isinstance(country, list):
+            for country_name in country:
+                current_analysis = AnovaAnalysis(df_path, country_name, anova_model)
+                current_analysis.run_analysis()
+        else:
+            current_analysis = AnovaAnalysis(df_path, country, anova_model)
+            current_analysis.run_analysis()
 
         response = input('Run another analysis? Y/N')
         if response.upper() in ['N', 'NO', 'STOP', 'EXIT', 'CLOSE', 'S', 'X', 'Q']:

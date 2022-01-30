@@ -6,6 +6,7 @@
 **/*.zip
 **/*.tar.xz
 **/error_list *.txt
+**/*.png
 
 
 .idea
