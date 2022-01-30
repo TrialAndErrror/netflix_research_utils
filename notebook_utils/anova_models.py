@@ -105,3 +105,4 @@ class AnovaAnalysis:
     def run_tukey_test(self, column_name):
         print(f'\n\nTukey Test: {self.name} [{column_name}]')
         return run_tukey_test(self.res, self.dataframe, column_name)
+
