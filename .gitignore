@@ -3,6 +3,12 @@
 **/*.json
 **/*.csv
 **/*.xml
+**/*.zip
+**/*.tar.xz
+**/error_list *.txt
+
+
+.idea
 
 
 
