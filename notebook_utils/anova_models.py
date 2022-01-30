@@ -75,7 +75,7 @@ class AnovaAnalysis:
             anova_df = self.perform_one_way_anova()
 
             print(anova_df)
-            dfi.export(anova_df, f'ANOVA_{self.name}_{self.country}.png')
+            dfi.export(anova_df, f'ANOVA_{self.name}_{self.country}_{self.anova_model}.png')
             if anova_df.iloc[0]['PR(>F)'] < .05:
                 tukey_test, tukey_obj = self.run_tukey_test('group')
                 print(tukey_test)
