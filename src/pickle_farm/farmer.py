@@ -46,7 +46,7 @@ def setup_dirs():
     """
     Make sure that the overall Results directory exists.
     """
-    results_dir = Path(os.getcwd(), 'results')
+    results_dir = Path(os.getcwd(), 'pickle_results')
     results_dir.mkdir(exist_ok=True)
 
     """

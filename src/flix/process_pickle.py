@@ -35,16 +35,23 @@ def read_info_soup(filename):
 
     results = None
     missing_data = check_for_missing_data(soup)
+    result_date = '0/00/0000'
 
+    obj_soup = BeautifulSoup(obj, features='lxml')
     if not missing_data:
-        obj_soup = BeautifulSoup(obj, features='lxml')
         netflix_table = obj_soup.find(id='netflix')
         if netflix_table:
             html_snippet = str(netflix_table)
             data = pd.read_html(html_snippet)
             results = ('Netflix Info', data)
-
-    return title, results
+    try:
+        premiere_date = obj_soup.find('span', {'title': 'Premiere'})
+        result_date = premiere_date.text
+    except AttributeError:
+        print(f'Premiere date not found for {title}\n')
+    else:
+        print(f'Premiere Date: {result_date}\n')
+    return title, results, result_date
 
 
 def get_history_tables(soup: BeautifulSoup, html_obj):
@@ -138,18 +145,25 @@ def make_info_dfs():
     counter = 1
 
     info_dict = {}
+    premiere_dict = []
 
     for file in info_files:
         if not file.split('/')[-1].startswith('!!!'):
             print(f'Working on {counter}/{files_count}')
-            title, results = read_info_soup(file)
+            title, results, premiere_date = read_info_soup(file)
             if isinstance(results, tuple):
                 print_green(f'Found Info data for {title}')
                 info_dict[title] = results
-
+            premiere_dict.append({
+                'title': title,
+                'Premiere Date': premiere_date
+            })
         counter += 1
 
     save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='summary')
+    premiere_df = pd.DataFrame.from_records(premiere_dict)
+    premiere_df.to_csv('./pickle_jar/summary/premiere_dates_df.csv')
+    save_pickle(premiere_dict, '!!!premiere_dates!!!', extra_folder='summary')
 
 
 def make_history_dfs():
@@ -191,8 +205,8 @@ def make_langauge_dfs(dir=PICKLE_DIR):
 
 
 def make_dfs():
-    # make_info_dfs()
-    # make_history_dfs()
+    make_info_dfs()
+    make_history_dfs()
     make_langauge_dfs()
 
     print('\n\nResults saved.\n\n')

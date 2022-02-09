@@ -5,6 +5,7 @@ import datetime
 import pickle
 import os
 import json
+from pytrends.exceptions import ResponseError
 
 pytrend = TrendReq()
 
@@ -17,8 +18,11 @@ def get_file_path(key, timeframe):
 
 def get_pytrends_data(keyword, timeframe, file_path):
     pytrend.build_payload([keyword], timeframe=timeframe)
-    data = pytrend.interest_by_region(resolution='COUNTRY', inc_low_vol=True, inc_geo_code=False)
-
+    try:
+        data = pytrend.interest_by_region(resolution='COUNTRY', inc_low_vol=True, inc_geo_code=False)
+    except ResponseError as e:
+        data = f'Error: {e}'
+        print(f'Error with {keyword}')
     with open(file_path, 'wb+') as outfile:
         pickle.dump(data, outfile)
 
@@ -45,7 +49,13 @@ def process_df_line(df):
     keyword = df.title
     timeframe = df['Date Range']
     os.makedirs(PICKLE_FOLDER, exist_ok=True)
-    return load_or_fetch_data(keyword, timeframe)
+    print(f'({df["Unnamed: 0"]}) Working on {keyword}')
+    result = load_or_fetch_data(keyword, timeframe)
+    try:
+        result = result.reset_index()
+    except AttributeError:
+        result = None
+    return result
 
 
 def create_date_range_column(df):

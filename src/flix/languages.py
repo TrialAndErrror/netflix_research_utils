@@ -4,7 +4,6 @@ import requests
 import time
 from src.flix.debug_messages import print_connection_error, print_found, print_missing, print_pickle_exists
 from src.flix import BASE_URL
-from src.flix.data import NETFLIX_ORIGINALS
 from http.client import RemoteDisconnected
 from ssl import SSLEOFError
 
@@ -43,10 +42,10 @@ def get_languages(title):
         print_pickle_exists()
 
 
-def flix_languages():
+def flix_languages(nf_id_dict):
     missing_titles = []
 
-    for movie in NETFLIX_ORIGINALS:
+    for movie in nf_id_dict:
         missing = get_languages(movie)
 
         if missing:

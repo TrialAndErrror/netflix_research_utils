@@ -3,11 +3,10 @@ import requests
 from requests.exceptions import ConnectionError
 from pathlib import Path
 from slugify import slugify
-
+from src.flix.data import NETFLIX_ORIGINALS
 
 from src.flix import BASE_URL, PICKLE_DIR
 from src.flix.utils import save_pickle, get_pickle_path, check_for_404
-from src.flix.data import NETFLIX_ORIGINALS
 from src.flix.debug_messages import print_missing, print_found, print_pickle_exists, print_connection_error
 from src.flix.process_pickle import make_dfs
 
@@ -41,10 +40,10 @@ def get_movie(title):
         print_pickle_exists()
 
 
-def flix_history():
+def flix_history(nf_id_dict):
     missing_titles = []
 
-    for movie in NETFLIX_ORIGINALS:
+    for movie in nf_id_dict:
         missing = get_movie(movie)
 
         if missing:
@@ -53,4 +52,4 @@ def flix_history():
 
 
 if __name__ == '__main__':
-    flix_history()
+    flix_history(NETFLIX_ORIGINALS)
