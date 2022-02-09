@@ -1,6 +1,6 @@
 from pathlib import Path
 import pickle
-
+import json
 TEST_COLUMNS = ['sub_English', 'dub_Spanish', 'sub_Dutch']
 
 
@@ -8,14 +8,14 @@ class PickleReader:
     def __init__(self, path: Path):
         self.path: Path = path
         self.data: pickle or None = None
-        self.title: str or None = None
-        self.nfid: int or None = None
+        self.title: str = ''
+        self.nfid: int = 0
 
-        self.language_data: dict or None = None
+        self.language_data: dict = {}
 
-        self.original_language: str or None = None
-        self.dub_language_dict: dict or None = None
-        self.sub_language_dict: dict or None = None
+        self.original_language: str = 'No Language Detected'
+        self.dub_language_dict: dict = {}
+        self.sub_language_dict: dict = {}
 
         self.get_data()
 
@@ -97,6 +97,31 @@ class PickleReader:
         if self.title:
             return f'{self.title} (PickleReader)'
         return 'Unnamed PickleReader'
+
+    def to_json(self):
+        data_dict = {
+            'nfid': self.nfid,
+            'title': self.title,
+            'original_language': self.original_language,
+            'dub_language_dict': self.dub_language_dict,
+            'sub_language_dict': self.sub_language_dict,
+            'language_data': self.language_data,
+            'data': self.data,
+        }
+        return json.dumps(data_dict)
+
+    def get_all_languages(self):
+        dub_languages = []
+        for language_list in self.dub_language_dict.values():
+            dub_languages.extend([f'dub_{language.strip()}' for language in language_list])
+        sub_languages = []
+
+        for language_list in self.sub_language_dict.values():
+            sub_languages.extend([f'sub_{language.strip()}' for language in language_list])
+
+        all_languages = dub_languages + sub_languages
+
+        return all_languages
 
 
 def check_for_languages(data_dict: dict) -> dict:

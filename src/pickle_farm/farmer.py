@@ -23,7 +23,8 @@ def run_all_pickles(pickle_dir: Path or str = PICKLES_DIR):
     """
     Process all pickles from pickle_folder, returning a dataframe and list of errors
     """
-    df, error_list = process_pickles_into_df(pickle_folder.iterdir())
+    language_list = get_languages_list(pickle_folder.iterdir())
+    df, error_list = process_pickles_into_df(pickle_folder.iterdir(), language_list)
 
     """
     Save dataframe to output folder
@@ -100,7 +101,16 @@ def save_dataframes(df, output_folder):
         country_df.to_csv(str(country_df_path))
 
 
-def process_pickles_into_df(all_pickles):
+def get_languages_list(all_pickles) -> list:
+    languages_list = []
+    for pickle in all_pickles:
+        languages_list.extend(PickleReader(pickle).get_all_languages())
+        languages_list = list(set(languages_list))
+
+    return languages_list
+
+
+def process_pickles_into_df(all_pickles, language_list):
     """
     Process all pickle files into one dataframe and return error list.
 
@@ -130,7 +140,10 @@ def process_pickles_into_df(all_pickles):
                 for key, value in LANG_REPLACEMENTS.items():
                     obj.replace_language(key, value)
 
-            all_entries.extend(obj.make_dataframe_entries(LANGUAGE_COLUMNS))
+            if obj.title == 'Miami Bici':
+                print('pass')
+
+            all_entries.extend(obj.make_dataframe_entries(language_list))
         else:
             error_list.append(str(pickle).split('/')[-1].split('.')[-2])
 
