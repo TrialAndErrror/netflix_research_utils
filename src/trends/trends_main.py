@@ -72,11 +72,13 @@ def debug():
 
 
 def run_trends_data():
+    output_dir = Path(os.getcwd(), 'results')
+    output_dir.mkdir(exist_ok=True)
     premiere_dates_df = pd.read_csv('./premiere_dates_df.csv')
     total_df = create_date_range_column(premiere_dates_df)
     applied_df = total_df.apply(lambda df_param: process_df_line(df_param), axis='columns', result_type='expand')
     df = pd.concat([total_df, applied_df], axis='columns')
-    df.to_csv('trends_data_output.csv')
+    df.to_csv(Path(output_dir, 'trends_data_output.csv'))
 
 
 if __name__ == '__main__':
