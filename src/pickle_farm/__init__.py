@@ -1,4 +1,4 @@
-PICKLES_DIR = '/home/wade/PycharmProjects/chetflix/src/pickle_farm/data_backups/pickles'
+PICKLES_DIR = '/home/wade/PycharmProjects/chetflix/src/results/pickles'
 
 ENABLE_REPLACEMENTS = False
 

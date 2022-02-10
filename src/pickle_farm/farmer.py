@@ -106,7 +106,6 @@ def get_languages_list(all_pickles) -> list:
     for pickle in all_pickles:
         languages_list.extend(PickleReader(pickle).get_all_languages())
         languages_list = list(set(languages_list))
-
     return languages_list
 
 
@@ -140,7 +139,7 @@ def process_pickles_into_df(all_pickles, language_list):
                 for key, value in LANG_REPLACEMENTS.items():
                     obj.replace_language(key, value)
 
-            if obj.title == 'Miami Bici':
+            if obj.title == 'True Memoirs of an International Assassin':
                 print('pass')
 
             all_entries.extend(obj.make_dataframe_entries(language_list))
@@ -169,3 +168,4 @@ def test_pickle(pickle_dir: str = PICKLES_DIR) -> PickleReader:
 
 if __name__ == '__main__':
     run_all_pickles()
+

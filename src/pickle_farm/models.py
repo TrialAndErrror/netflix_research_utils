@@ -1,6 +1,9 @@
 from pathlib import Path
 import pickle
 import json
+
+from typing import List
+
 TEST_COLUMNS = ['sub_English', 'dub_Spanish', 'sub_Dutch']
 
 
@@ -60,7 +63,7 @@ class PickleReader:
         with open(self.path, 'w+b') as file:
             pickle.dump(self.data, file)
 
-    def make_dataframe_entries(self, columns: list[str]) -> list:
+    def make_dataframe_entries(self, columns: List[str]) -> list:
         """
         Iterate over language_data to find language that match columns provided.
         Creates list of dictionaries that can be used as an entry for a DataFrame.
@@ -113,14 +116,19 @@ class PickleReader:
     def get_all_languages(self):
         dub_languages = []
         for language_list in self.dub_language_dict.values():
-            dub_languages.extend([f'dub_{language.strip()}' for language in language_list])
+            dub_languages.extend([f'dub_{language}' for language in language_list])
         sub_languages = []
 
         for language_list in self.sub_language_dict.values():
-            sub_languages.extend([f'sub_{language.strip()}' for language in language_list])
+            sub_languages.extend([f'sub_{language}' for language in language_list])
 
-        all_languages = dub_languages + sub_languages
+        all_languages = list(set(dub_languages + sub_languages))
 
+        for value in ['dub_S2(4)', 'dub_S2(13)', 'dub_S1(5)', 'dub_S2(34)', 'dub_S1(20)', 'dub_S1(21)', 'dub_S3(5)',
+                      'dub_S1(28)', 'dub_S1(8)', 'dub_S1(44)', 'dub_S1(26)', 'dub_S1(9)', 'dub_S2(6)', 'dub_S1(6)',
+                      'dub_S2(9)', 'dub_S1(50)', 'dub_S1(13)', 'dub_S1(24)', 'dub_S1(4)', 'dub_S1(30)', 'dub_S1(10)']:
+            if value in all_languages:
+                breakpoint()
         return all_languages
 
 
@@ -137,7 +145,7 @@ def check_for_languages(data_dict: dict) -> dict:
     def get_language_list(country_dict: dict, lang_type: str) -> list:
         languages: str = country_dict.get(lang_type)
         try:
-            language_list = languages.split(',')
+            language_list = [item.strip() for item in languages.split(',')]
         except TypeError:
             language_list = []
         return language_list
@@ -176,7 +184,7 @@ def split_subs_and_dubs(data_dict: dict, lang_type: str) -> dict:
 
     results = {}
     for country, data in data_dict.items():
-        results[country] = data[lang_type]
+        results[country] = [item for item in data[lang_type] if len(item) > 0]
     return results
 
 

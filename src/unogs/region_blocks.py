@@ -13,6 +13,12 @@ DUB_LIST_SUFFIX = '/div/div[1]'
 SUB_LIST_SUFFIX = '/div/div[2]'
 BUTTON_SUFFIX = '/button[1]'
 
+"""
+Alt XPATHS provided in case the Seasons div accidentally appears.
+"""
+ALT_DUB_LIST_SUFFIX = '/div/div[2]'
+ALT_SUB_LIST_SUFFIX = '/div/div[3]'
+
 
 def click_more_button(driver: webdriver, xpath: str, title: str):
     """
@@ -87,6 +93,14 @@ def process_region_blocks(driver: webdriver, region_blocks: list, title: str):
         subs_div = driver.find_element(By.XPATH, subs_div_xpath)
         dubs_div = driver.find_element(By.XPATH, dubs_div_xpath)
 
+        """
+        Adjust for if there is accidentally a seasons block.
+        """
+        if dubs_div.text.split(':', maxsplit=1)[0] == 'Seasons':
+            subs_div_xpath = xpath + SUB_LIST_SUFFIX
+            dubs_div_xpath = xpath + DUB_LIST_SUFFIX
+            subs_div = driver.find_element(By.XPATH, subs_div_xpath)
+            dubs_div = driver.find_element(By.XPATH, dubs_div_xpath)
         """
         Read the Subs div and Dubs div to get a list of languages available.
         
