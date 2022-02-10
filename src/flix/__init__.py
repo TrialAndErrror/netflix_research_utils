@@ -9,4 +9,4 @@ TEST_URL = 'https://flixpatrol.com/title/cobra-kai/'
 
 PICKLE_DIR = Path(os.getcwd(), 'pickle_jar')
 
-os.makedirs(PICKLE_DIR, exist_ok=True)
+

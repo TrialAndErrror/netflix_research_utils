@@ -79,6 +79,7 @@ def run_all(nf_id_dict=NETFLIX_ORIGINALS):
 
 
 if __name__ == '__main__':
+    os.makedirs(PICKLE_DIR, exist_ok=True)
     nf_dict_path = Path(os.getcwd(), 'nf_dict.json')
     if nf_dict_path.exists():
         data = read_file(nf_dict_path)
