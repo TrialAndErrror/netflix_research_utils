@@ -1,6 +1,7 @@
 from pathlib import Path
 import pickle
 import json
+from slugify import slugify
 
 from typing import List
 
@@ -86,6 +87,8 @@ class PickleReader:
 
             for column in dub_columns:
                 entry[column] = bool(column.split('_')[1] in lang_list['Dub'])
+
+            entry['slug'] = slugify(self.title)
 
             entry_list.append(entry)
 

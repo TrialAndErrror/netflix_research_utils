@@ -4,8 +4,8 @@ from slugify import slugify
 
 def merge_unogs_and_gt(unogs_df, gt_data):
     test = unogs_df.copy()
-    test['slug'] = test['title'].apply(lambda x: slugify(x))
-    sample = test.merge(gt_data, left_on='slug', right_on='slug', how='left').drop('Unnamed: 0', axis=1)
+    # test['slug'] = test['title'].apply(lambda x: slugify(x))
+    sample = test.merge(gt_data, left_on='slug', right_on='slug', how='left')
     return sample
 
 

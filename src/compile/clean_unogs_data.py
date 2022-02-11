@@ -62,7 +62,8 @@ def find_and_remove_pattern(pattern, mylist):
     :return: None",
     """
     r = re.compile(pattern)
-    return [item for item in mylist if item not in list(filter(r.match, mylist))]
+    matches = list(filter(r.match, mylist))
+    return [item for item in mylist if item not in matches]
 
 
 def remove_season_columns(mylist):
@@ -81,7 +82,7 @@ def remove_irrelevant_language_cols(mylist):
     """
     
     criteria = [
-        'Original',
+        '\[Original\]',
         'Undefined',
         'Audio',
         'Multiple',
@@ -98,6 +99,7 @@ def remove_specific_columns(mylist):
     Remove extra specified columns.
     """
     removal_list = REMOVE_LIST + MANUAL_REMOVAL
+    # removal_list = REMOVE_LIST
     return [item for item in mylist if item not in removal_list]
 
 
@@ -138,7 +140,11 @@ def replace_columns(df):
 
     def consolidate_all_columns(df):
         df.apply(lambda x: consolidate_column(x, replace_dict))
-        sub_df = df.drop(replace_dict.keys(), axis=1)
+        for language in replace_dict.keys():
+            try:
+                sub_df = df.drop(language, axis=1)
+            except KeyError:
+                pass
         return sub_df
 
     return consolidate_all_columns(df)
@@ -149,7 +155,7 @@ def clean_unogs(unogs_df_path='final_unogs_df.csv'):
     col_list = perform_all_cleaning(unogs_df.columns)
 
     cleaned_unogs_df = unogs_df[col_list]
-
+    # cleaned_unogs_df.to_csv('clean_unogs_df.csv')
     return replace_columns(cleaned_unogs_df)
 
 

@@ -69,6 +69,12 @@ def get_all_languages(df):
 
 def perform_make_exclusive(df):
     lang_list = get_all_languages(df)
+    max_count = len(lang_list)
+    count = 1
     for lang in lang_list:
+        print(f'({count}/{max_count})Grouping {lang}')
         df = df.apply(lambda x: set_exclusive_columns(x, language=lang), axis=1)
-    return df
+        count += 1
+
+    new_df = df[[item for item in df.columns if not item[:3] in ['sub', 'dub']]]
+    return new_df
