@@ -114,13 +114,43 @@ def perform_all_cleaning(col_list):
     return col_list
 
 
+def replace_columns(df):
+    replace_dict = {
+        'sub_English (India)': 'sub_English',
+        'sub_Arabic (Egypt)': 'sub_Arabic',
+        'sub_Serbian (Latin)': 'sub_Serbian',
+        'sub_Arabic (Lebanon)': 'sub_Arabic',
+        'sub_Traditional Chinese (Hong Kong SAR China)': 'sub_Traditional Chinese',
+        'sub_Arabic (Saudi Arabia)': 'sub_Arabic',
+        'dub_Mandarin (Putonghua)': 'dub_Mandarin',
+        'dub_Arabic (Egypt)': 'dub_Arabic',
+        'dub_Arabic (Palestine)': 'dub_Arabic',
+        'dub_Arabic (Syria)': 'dub_Arabic',
+        'dub_Mandarin (Guoyu)': 'dub_Mandarin'
+    }
+
+    def consolidate_column(row, replace_dict):
+        for key, value in replace_dict.items():
+            try:
+                row[value] = bool(row[key] or row[value])
+            except KeyError:
+                pass
+
+    def consolidate_all_columns(df):
+        df.apply(lambda x: consolidate_column(x, replace_dict))
+        sub_df = df.drop(replace_dict.keys(), axis=1)
+        return sub_df
+
+    return consolidate_all_columns(df)
+
+
 def clean_unogs(unogs_df_path='final_unogs_df.csv'):
     unogs_df = pd.read_csv(unogs_df_path)
     col_list = perform_all_cleaning(unogs_df.columns)
 
     cleaned_unogs_df = unogs_df[col_list]
 
-    return cleaned_unogs_df
+    return replace_columns(cleaned_unogs_df)
 
 
 if __name__ == '__main__':
