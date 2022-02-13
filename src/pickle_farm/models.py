@@ -5,7 +5,46 @@ from slugify import slugify
 
 from typing import List
 
-TEST_COLUMNS = ['sub_English', 'dub_Spanish', 'sub_Dutch']
+ALL_COUNTRIES = [
+    'Argentina',
+    'Australia',
+    'Belgium',
+    'Brazil',
+    'Canada',
+    'Colombia',
+    'Czech Republic',
+    'France',
+    'Germany',
+    'Greece',
+    'Hong Kong',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Israel',
+    'Italy',
+    'Japan',
+    'Lithuania',
+    'Malaysia',
+    'Mexico',
+    'Netherlands',
+    'Philippines',
+    'Poland',
+    'Portugal',
+    'Romania',
+    'Russia',
+    'Singapore',
+    'Slovakia',
+    'South Africa',
+    'South Korea',
+    'Spain',
+    'Sweden',
+    'Switzerland',
+    'Thailand',
+    'Turkey',
+    'Ukraine',
+    'United Kingdom',
+    'United States'
+]
 
 
 class PickleReader:
@@ -41,14 +80,17 @@ class PickleReader:
 
             self.nfid = data.pop('nfid', None)
 
-            self.language_data = check_for_languages(data['languages'])
+            self.language_data = {country: list() for country in ALL_COUNTRIES}
+            self.language_data.update(check_for_languages(data['languages']))
 
             self.make_sub_and_dub_dicts()
 
             self.original_language = get_original_language(self.dub_language_dict)
 
     def replace_language(self, old_lang, new_lang):
-        new_dict = {country: {sub_or_dub: [item.replace(old_lang, new_lang) for item in s_data] for (sub_or_dub, s_data) in c_data.items()} for (country, c_data) in self.language_data.items()}
+        new_dict = {
+            country: {sub_or_dub: [item.replace(old_lang, new_lang) for item in s_data] for (sub_or_dub, s_data) in
+                      c_data.items()} for (country, c_data) in self.language_data.items()}
         self.language_data = new_dict
 
     def make_sub_and_dub_dicts(self):
@@ -127,11 +169,6 @@ class PickleReader:
 
         all_languages = list(set(dub_languages + sub_languages))
 
-        for value in ['dub_S2(4)', 'dub_S2(13)', 'dub_S1(5)', 'dub_S2(34)', 'dub_S1(20)', 'dub_S1(21)', 'dub_S3(5)',
-                      'dub_S1(28)', 'dub_S1(8)', 'dub_S1(44)', 'dub_S1(26)', 'dub_S1(9)', 'dub_S2(6)', 'dub_S1(6)',
-                      'dub_S2(9)', 'dub_S1(50)', 'dub_S1(13)', 'dub_S1(24)', 'dub_S1(4)', 'dub_S1(30)', 'dub_S1(10)']:
-            if value in all_languages:
-                breakpoint()
         return all_languages
 
 
@@ -145,6 +182,7 @@ def check_for_languages(data_dict: dict) -> dict:
     """
     Private function for just splitting string-based list of languages into list, with error handling.
     """
+
     def get_language_list(country_dict: dict, lang_type: str) -> list:
         languages: str = country_dict.get(lang_type)
         try:
@@ -205,7 +243,3 @@ def get_original_language(dub_dict):
         for entry in lang_list:
             if entry.strip().endswith('[Original]'):
                 return entry.split('[')[-2].strip()
-
-
-
-

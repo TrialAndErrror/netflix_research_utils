@@ -3,6 +3,17 @@ import pickle
 import re
 from pathlib import Path
 from src.flix import PICKLE_DIR
+from slugify import slugify
+
+
+def get_slug(title):
+    if title == 'Security (Netflix Original)':
+        slug = 'security-2021'
+    elif title == 'Outlaws (Netflix Original)':
+        slug = 'outlaws-2021'
+    else:
+        slug = slugify(title).replace('/', '')
+    return slug
 
 
 def check_for_404(soup_data):

@@ -34,13 +34,13 @@ def get_sub_and_dub(row, sub_col, dub_col):
 
 def get_neither(row, sub_col, dub_col):
     try:
-        result = bool(row[dub_col] and row[sub_col])
+        result = not bool(row[dub_col] and row[sub_col])
     except KeyError:
         try:
-            result = bool(row[dub_col])
+            result = not bool(row[dub_col])
         except KeyError:
             try:
-                result = bool(row[sub_col])
+                result = not bool(row[sub_col])
             except KeyError:
                 result = False
 
@@ -51,10 +51,16 @@ def set_exclusive_columns(row, language):
     sub_col = f'sub_{language}'
     dub_col = f'dub_{language}'
 
-    row[f'grp_neither_{language}'] = get_neither(row, sub_col, dub_col)
     row[f'grp_sub_only_{language}'] = get_sub_only(row, sub_col, dub_col)
     row[f'grp_dub_only_{language}'] = get_dub_only(row, sub_col, dub_col)
     row[f'grp_both_{language}'] = get_sub_and_dub(row, sub_col, dub_col)
+
+    row[f'grp_neither_{language}'] = bool(
+            int(row[f'grp_sub_only_{language}'])
+            + int(row[f'grp_dub_only_{language}'])
+            + int(row[f'grp_dub_only_{language}'])
+            < 1
+    )
 
     return row
 

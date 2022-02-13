@@ -104,15 +104,6 @@ def read_language_soup(filename):
     netflix_table = soup.find(id='toc-netflix')
     results = None
 
-    # results = None
-    # try:
-    #     missing_data = check_for_missing_data(soup)
-    # except TypeError:
-    #     print_red('Error: Object text might not exist')
-    #     print(f'Corrupted text: {soup}')
-    #     missing_data = True
-
-    # if not missing_data:
     if netflix_table:
         results = get_languages_list(netflix_table)
 

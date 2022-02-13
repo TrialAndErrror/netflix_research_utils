@@ -139,9 +139,6 @@ def process_pickles_into_df(all_pickles, language_list):
                 for key, value in LANG_REPLACEMENTS.items():
                     obj.replace_language(key, value)
 
-            if obj.title == 'True Memoirs of an International Assassin':
-                print('pass')
-
             all_entries.extend(obj.make_dataframe_entries(language_list))
         else:
             error_list.append(str(pickle).split('/')[-1].split('.')[-2])

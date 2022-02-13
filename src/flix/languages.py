@@ -1,5 +1,4 @@
-from slugify import slugify
-from src.flix.utils import get_pickle_path, check_for_404, save_pickle
+from src.flix.utils import get_pickle_path, check_for_404, save_pickle, get_slug
 import requests
 import time
 from src.flix.debug_messages import print_connection_error, print_found, print_missing, print_pickle_exists
@@ -8,10 +7,10 @@ from http.client import RemoteDisconnected
 from ssl import SSLEOFError
 
 
-def get_languages(title):
+def get_countries(title):
     s = requests.session()
     print(f'Working on {title}')
-    slug = slugify(title).replace('/', '')
+    slug = get_slug(title)
     print(f'Slug: {slug}')
 
     pickle_path = get_pickle_path(slug, extra_folder='language')
@@ -42,11 +41,11 @@ def get_languages(title):
         print_pickle_exists()
 
 
-def flix_languages(nf_id_dict):
+def flix_countries(nf_id_dict):
     missing_titles = []
 
     for movie in nf_id_dict:
-        missing = get_languages(movie)
+        missing = get_countries(movie)
 
         if missing:
             missing_titles.append(missing)

@@ -88,7 +88,7 @@ def compile_main():
 
     if isinstance(grouped_df, pd.DataFrame):
         grouped_df = grouped_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
-        grouped_df = grouped_df[(final_df['Country'] == grouped_df['level_1']) | (grouped_df['level_1'].isna())]
+        grouped_df = grouped_df[(grouped_df['Country'] == grouped_df['level_1']) | (grouped_df['level_1'].isna())]
         grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_and_top10.csv'))
 
     # flixpatrol_points_dataframe = clean_flixpatrol_data(FILE_PATH['flix_top10'])
@@ -110,7 +110,7 @@ def compile_main():
     """
     print('\nLoading FlixPatrol Countries Data')
     flixpatrol_countries_dataframe = clean_flix_countries(FILE_PATH['flix_country'])
-    final_df = final_df.merge(flixpatrol_countries_dataframe, left_on=['slug', 'Country'], right_index=True, how='left')
+    final_df = final_df.merge(flixpatrol_countries_dataframe, left_on='slug', right_index=True, how='left')
     final_df.to_csv(Path(PARTS_PATH, '[p]unogs_gt_top10_and_countries.csv'))
 
     if isinstance(grouped_df, pd.DataFrame):
