@@ -1,6 +1,47 @@
 import pandas as pd
+import numpy as np
 
 from src.flix.utils import load_pickle
+
+ALL_COUNTRIES = [
+    'Argentina',
+    'Australia',
+    'Belgium',
+    'Brazil',
+    'Canada',
+    'Colombia',
+    'Czech Republic',
+    'France',
+    'Germany',
+    'Greece',
+    'Hong Kong',
+    'Hungary',
+    'Iceland',
+    'India',
+    'Israel',
+    'Italy',
+    'Japan',
+    'Lithuania',
+    'Malaysia',
+    'Mexico',
+    'Netherlands',
+    'Philippines',
+    'Poland',
+    'Portugal',
+    'Romania',
+    'Russia',
+    'Singapore',
+    'Slovakia',
+    'South Africa',
+    'South Korea',
+    'Spain',
+    'Sweden',
+    'Switzerland',
+    'Thailand',
+    'Turkey',
+    'Ukraine',
+    'United Kingdom',
+    'United States']
 
 
 def replace_indices_with_country(dict):
@@ -107,10 +148,33 @@ def clean_flixpatrol_data(history_file):
     for key, value in history_data.items():
         cleaned_movies_history[key] = {}
         for data_tuple in value:
-            cleaned_movies_history[key][data_tuple[0]] = data_tuple[1][0].to_dict()
+            data_dict = data_tuple[1][0].to_dict()
+            data_dict = add_missing_countries_to_data_dict(data_dict)
+            cleaned_movies_history[key][data_tuple[0]] = data_dict
 
     dataframes_to_join = prepare_dataframes_to_join(cleaned_movies_history)
 
     overall_df = dataframes_to_join[0].join(dataframes_to_join[1:], how="outer")
     mergeable_flix = overall_df.reset_index()
     return mergeable_flix
+
+
+def add_missing_countries_to_data_dict(data_dict):
+    for country in ALL_COUNTRIES:
+        if country not in data_dict['Country'].values():
+            if 'Days' in data_dict.keys():                              # FlixPatrol Top 10 list
+                index_num = len(data_dict['Country'])
+                data_dict['Country'][index_num] = country
+                data_dict['Points'][index_num] = 0
+                data_dict['Unnamed: 2'][index_num] = np.nan
+                data_dict['Days'][index_num] = '0 days'
+                data_dict['ø/day'][index_num] = 0.0
+            else:                                                       # Netflix Top 10 list
+                index_num = len(data_dict['Country'])
+                data_dict['Country'][index_num] = country
+                data_dict['Points'][index_num] = 0
+                data_dict['Points.1'][index_num] = np.nan
+                data_dict['Weeks'][index_num] = 0
+                data_dict['Weeks.1'][index_num] = '/'
+
+    return data_dict

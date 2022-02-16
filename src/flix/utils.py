@@ -2,8 +2,13 @@ import os
 import pickle
 import re
 from pathlib import Path
+
+import pandas as pd
+
 from src.flix import PICKLE_DIR
 from slugify import slugify
+
+from src.utils import write_file
 
 
 def get_slug(title):
@@ -41,3 +46,24 @@ def load_pickle(filename):
     with open(filename, 'rb') as file:
         data = pickle.load(file)
     return data
+
+
+def save_premiere_dates_df(premiere_dict):
+    premiere_df = pd.DataFrame.from_records(premiere_dict).infer_objects()
+    premiere_df['Premiere Date'] = pd.to_datetime(premiere_df['Premiere Date'], format='%m/%d/%Y')
+    valid_df = premiere_df[premiere_df['Premiere Date'] > '01/01/2004']
+    valid_df.to_csv('./pickle_jar/summary/premiere_dates_df.csv')
+
+    # save_pickle(premiere_dict, '!!!premiere_dates!!!', extra_folder='summary')
+
+
+def save_top10_dict(data, filename):
+    export_dict = {}
+    for title, data_tuple in data:
+        export_dict[title] = {}
+
+        df_list: pd.DataFrame
+        for chart_type, df_list in data_tuple:
+            export_dict[title][chart_type] = df_list[0].to_json()
+
+    write_file(export_dict, Path(os.getcwd(), PICKLE_DIR, 'summary', filename))

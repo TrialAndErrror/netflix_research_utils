@@ -80,7 +80,7 @@ class PickleReader:
 
             self.nfid = data.pop('nfid', None)
 
-            self.language_data = {country: list() for country in ALL_COUNTRIES}
+            self.language_data = {country: dict() for country in ALL_COUNTRIES}
             self.language_data.update(check_for_languages(data['languages']))
 
             self.make_sub_and_dub_dicts()
@@ -118,22 +118,24 @@ class PickleReader:
         sub_columns = [item for item in columns if item.startswith('sub_')]
         dub_columns = [item for item in columns if item.startswith('dub_')]
 
-        for country, lang_list in self.language_data.items():
+        for country, lang_dict in self.language_data.items():
             entry = dict()
             entry['title'] = self.title
             entry['Original Language'] = self.original_language
             entry['Country'] = country
 
             for column in sub_columns:
-                entry[column] = bool(column.split('_')[1] in lang_list['Sub'])
+                entry[column] = bool(column.split('_')[1] in lang_dict.get('Sub', list()))
 
             for column in dub_columns:
-                entry[column] = bool(column.split('_')[1] in lang_list['Dub'])
+                entry[column] = bool(column.split('_')[1] in lang_dict.get('Dub', list()))
 
             entry['slug'] = slugify(self.title)
 
             entry_list.append(entry)
 
+        if len(entry_list) < 38:
+            breakpoint()
         return entry_list
 
     def __repr__(self):
@@ -225,7 +227,8 @@ def split_subs_and_dubs(data_dict: dict, lang_type: str) -> dict:
 
     results = {}
     for country, data in data_dict.items():
-        results[country] = [item for item in data[lang_type] if len(item) > 0]
+        if len(data) > 0:
+            results[country] = [item for item in data[lang_type] if len(item) > 0]
     return results
 
 

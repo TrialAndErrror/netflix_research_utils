@@ -134,13 +134,14 @@ def run_all_movies(nf_dict: dict):
     """
     for title, nfid in nf_dict.items():
         print(f'Working on {title}: [{count}/{total_count}]')
-
+        result = None
         try:
             data = load_pickle(f'{slugify(title)}.pickle')
         except FileNotFoundError:
             result = process_movie_entry(driver, nfid, title)
         else:
-            result = data.get('languages')
+            if isinstance(result, dict):
+                result = data.get('languages')
 
         """
         Process movie entry.

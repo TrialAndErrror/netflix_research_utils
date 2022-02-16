@@ -75,12 +75,13 @@ def compile_main():
     final_df = merge_unogs_and_google_trends(unogs_df, gt_data)
 
     if isinstance(grouped_df, pd.DataFrame):
-        merge_grouped_and_google_trends(grouped_df, gt_data)
+        grouped_df = merge_grouped_and_google_trends(grouped_df, gt_data)
 
     """
     Load and Merge FlixPatrol Top 10 Overall Data
     """
     print('\nLoading FlixPatrol Top 10 Data')
+
     flixpatrol_points_dataframe = clean_flixpatrol_data(FILE_PATH['flix_top10'])
     final_df = final_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
     final_df = final_df[(final_df['Country'] == final_df['level_1']) | (final_df['level_1'].isna())]
@@ -90,20 +91,6 @@ def compile_main():
         grouped_df = grouped_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
         grouped_df = grouped_df[(grouped_df['Country'] == grouped_df['level_1']) | (grouped_df['level_1'].isna())]
         grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_and_top10.csv'))
-
-    # flixpatrol_points_dataframe = clean_flixpatrol_data(FILE_PATH['flix_top10'])
-    # final_df = final_df.merge(flixpatrol_points_dataframe,
-    #                           left_on=['slug', 'Country'],
-    #                           right_on=['level_0', 'level_1'],
-    #                           how='left')
-    # final_df.to_csv(Path(PARTS_PATH, '[p]unogs_gt_and_top10.csv'))
-    #
-    # if isinstance(grouped_df, pd.DataFrame):
-    #     grouped_df = grouped_df.merge(flixpatrol_points_dataframe,
-    #                                   left_on=['slug', 'Country'],
-    #                                   right_on=['level_0', 'level_1'],
-    #                                   how='left')
-    #     grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_and_top10.csv'))
 
     """
     Load and Merge FlixPatrol Countries Data
@@ -118,6 +105,11 @@ def compile_main():
         grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_top10_and_countries.csv'))
 
     """
+    Be sure to remove any unnecesary columns before saving.
+    """
+    final_df, grouped_df = clean_col_names(final_df, grouped_df)
+
+    """
     Save Final Results
     """
     output_folder = create_output_folder()
@@ -126,26 +118,24 @@ def compile_main():
     grouped_path = Path(output_folder, "grp_compiled_data.csv")
 
     print(f'\nSaving Final Dataframe to {final_path}')
+
     final_df.to_csv(final_path)
     grouped_df.to_csv(grouped_path)
 
-    """
-    Filter data down to Netflix Originals data only and save.
-    """
-    if nf_originals:
-        final_nfo_path = Path(output_folder, "final_netflix_original_data.csv")
-        print(f'\nSaving Final Netflix Originals Dataframe to {final_nfo_path}')
-        final_nf_dict = final_df[final_df['title'].isin(nf_originals.keys())]
-        final_nf_dict.to_csv(final_nfo_path)
-    else:
-        print(
-            'No netflix data found. '
-            'Include nf_dict.json if '
-            'you want to filter to '
-            'netflix originals only.'
-        )
-
     print('Compile Complete.')
+
+
+def clean_col_names(final_df, grouped_df):
+    columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
+    for col_name in columns_to_remove:
+
+        if col_name in final_df.columns:
+            final_df = final_df.drop(col_name, axis=1)
+
+        if col_name in grouped_df.columns:
+            grouped_df = grouped_df.drop(col_name, axis=1)
+
+    return final_df, grouped_df
 
 
 def merge_with_gt(df, gt_data, filename):
