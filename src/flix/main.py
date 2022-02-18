@@ -61,13 +61,46 @@ def flix_main(nf_id_dict):
         count += 1
 
 
+def update_movie_titles(nf_dict):
+    update_dict = {
+        'the-guilty': 'the-guilty-2021',
+        'house-arrest': 'house-arrest-2019',
+        'outlaws-netflix-original': 'outlaws'
+    }
+
+    for old_title, new_title in update_dict:
+        nf_dict[new_title] = nf_dict.pop(old_title)
+
+    return nf_dict
+
+
 def run_all(nf_id_dict=NETFLIX_ORIGINALS):
+    """
+    Run all FlixPatrol steps.
+
+    Main function.
+
+    :param nf_id_dict: dict
+    :return: None
+    """
+
+    """
+    Setup directories
+    """
     print('making directories')
     directories = ['history', 'info', 'summary', 'language']
 
     for dir in directories:
         os.makedirs(Path(PICKLE_DIR, dir), exist_ok=True)
 
+    """
+    Update titles where the slug does not match the FlixPatrol url.
+    """
+    nf_id_dict = update_movie_titles(nf_id_dict)
+
+    """
+    Gather all pickles from FlixPatrol data.
+    """
     print('FlixFetch: fetching movie info')
     flix_main(nf_id_dict)
     print('fetching movie history')
@@ -75,6 +108,9 @@ def run_all(nf_id_dict=NETFLIX_ORIGINALS):
     print('fetching movie countries')
     flix_countries(nf_id_dict)
 
+    """
+    Process pickles into DataFrames.
+    """
     make_dfs()
 
 
