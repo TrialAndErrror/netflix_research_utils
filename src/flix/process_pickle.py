@@ -100,8 +100,7 @@ def get_history_tables(soup: BeautifulSoup) -> List[tuple, pd.DataFrame]:
     """
     Support for Top 10 Overall, Top 10 Kids, and Netflix Official List has been deprecated.
     
-    Uncomment to re-enable:
-    
+    Uncomment to re-implement other Top10 tables:
     
     netflix_overall = soup.find(id='toc-netflix-1')
     if netflix_overall:

@@ -8,13 +8,29 @@ from ssl import SSLEOFError
 
 
 def get_countries(title):
+    """
+    Get FlixPatrol Top10 by Country data for an individual title.
+
+    :param title: str
+    :return: None
+    """
     s = requests.session()
     print(f'Working on {title}')
+
+    """
+    Get slug for title
+    """
     slug = get_slug(title)
     print(f'Slug: {slug}')
 
+    """
+    Check if pickle exists.
+    """
     pickle_path = get_pickle_path(slug, extra_folder='language')
     if not pickle_path.exists():
+        """
+        If pickle does not exist, fetch data from site.
+        """
         try:
             response = s.get(f'{BASE_URL}{slug}/streaming/')
         except ConnectionError:
@@ -26,8 +42,15 @@ def get_countries(title):
         else:
             soup_data = response.text
 
+            """
+            Check for 404
+            """
             movie_not_found = check_for_404(soup_data)
 
+            """
+            If movie not found, print to terminal.
+            Otherwise, save data as pickle
+            """
             if movie_not_found:
                 print_missing()
                 return slug
