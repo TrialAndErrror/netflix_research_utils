@@ -11,6 +11,12 @@
 
 .idea
 
-
+.patch
 
 /src/flix/pickle_jar/
+/src/trends/pickles/
+/src/won/output/
+/tiffany_movie_urls.txt
+/tiffany_movies.txt
+/wade_movie_urls.txt
+/wade_movies.txt
