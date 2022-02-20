@@ -1,9 +1,8 @@
-import os
 from pathlib import Path
 import numpy as np
 import sys
 import pickle
-from src.unogs import make_results_filename, INPUT_FOLDER, OUTPUT_FOLDER, PROCESSED_FOLDER
+from src.unogs import INPUT_FOLDER, OUTPUT_FOLDER, PROCESSED_FOLDER, PICKLE_FOLDER
 from src.utils import read_file, write_file
 
 
@@ -11,7 +10,7 @@ def setup_directories():
     INPUT_FOLDER.mkdir(exist_ok=True)
     OUTPUT_FOLDER.mkdir(exist_ok=True)
     PROCESSED_FOLDER.mkdir(exist_ok=True)
-    Path(OUTPUT_FOLDER, 'pickles').mkdir(exist_ok=True)
+    PICKLE_FOLDER.mkdir(exist_ok=True)
 
 
 def load_from_json_data(filename: str):
@@ -84,14 +83,14 @@ def create_nf_data_file(filename, nf_path):
 
 
 def save_pickle(data, filename: str):
-    path = Path(OUTPUT_FOLDER, 'pickles', filename)
+    path = Path(PICKLE_FOLDER, filename)
 
     with open(path, 'w+b') as file:
         pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def load_pickle(filename):
-    path = Path(OUTPUT_FOLDER, 'pickles', filename)
+    path = Path(PICKLE_FOLDER, filename)
     with open(path, 'rb') as file:
         data = pickle.load(file)
     return data

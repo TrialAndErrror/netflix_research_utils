@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import shutil
 
 
 def read_file(filename: Path):
@@ -14,3 +15,17 @@ def read_file(filename: Path):
 def write_file(data: dict, filename: Path):
     with open(filename, 'w+') as file:
         json.dump(data, file)
+
+
+def copy_file(file_path, dest_path):
+    try:
+        shutil.copy(file_path, dest_path)
+        print("File copied successfully.")
+
+    # If source and destination are same
+    except shutil.SameFileError:
+        print("Source and destination represents the same file.")
+
+    # If there is any permission issue
+    except PermissionError:
+        print("Permission denied.")

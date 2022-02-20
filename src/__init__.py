@@ -40,8 +40,6 @@ def make_processed_filename():
 def make_all_data_filename():
     return f'all_data_{add_timestamp()}.json'
 
-
-
 """
 Directory Setup:
 

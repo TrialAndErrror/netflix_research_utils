@@ -199,6 +199,8 @@ def get_site_data():
     driver.close()
     driver.quit()
 
+    return file_name
+
 
 if __name__ == '__main__':
     get_site_data()

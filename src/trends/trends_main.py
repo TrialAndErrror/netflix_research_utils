@@ -92,7 +92,7 @@ def process_df_lines(df):
     return pd.concat(results)
 
 
-if __name__ == '__main__':
+def trends_main():
     # run_trends_data()
     output_dir = Path(os.getcwd(), 'results')
     output_dir.mkdir(exist_ok=True)
@@ -101,4 +101,9 @@ if __name__ == '__main__':
     new_df = process_df_lines(total_df)
     print('stop')
     new_df.to_csv(Path(output_dir, 'trends_data_output.csv'))
+    return output_dir
+
+
+if __name__ == '__main__':
+    trends_main()
 
