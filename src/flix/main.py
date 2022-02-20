@@ -2,8 +2,10 @@ import os
 import time
 from pathlib import Path
 
+
 import requests
 from requests.exceptions import ConnectionError
+import pandas as pd
 
 from src.flix import BASE_URL, PICKLE_DIR
 from src.flix.utils import save_pickle, get_pickle_path, check_for_404, get_slug
@@ -109,13 +111,13 @@ def update_movie_titles(nf_dict) -> dict:
     :param nf_dict: dict
     :return: dict
     """
-    update_dict = {
-        'the-guilty': 'the-guilty-2021',
-        'house-arrest': 'house-arrest-2019',
-        'outlaws-netflix-original': 'outlaws'
-    }
 
-    for old_title, new_title in update_dict:
+    """
+    Read sheet of changes to dictionary using Pandas
+    """
+    dict_from_csv = pd.read_csv('csv_file.csv', header=None, index_col=0, squeeze=True).to_dict()
+
+    for old_title, new_title in dict_from_csv:
         nf_dict[new_title] = nf_dict.pop(old_title)
 
     return nf_dict
