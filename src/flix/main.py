@@ -14,7 +14,6 @@ from src.flix.debug_messages import print_missing, print_found, print_pickle_exi
 from src.flix.history import flix_history
 from src.flix.languages import flix_countries
 from src.flix.process_pickle import make_dfs
-from src.utils import read_file
 
 
 def get_movie(title):

@@ -37,6 +37,8 @@ def run_all_pickles(pickle_dir: Path or str = PICKLES_DIR):
     """
     save_error_list(error_list, output_folder)
 
+    return output_folder
+
 
 def setup_dirs():
     """

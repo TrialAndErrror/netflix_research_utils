@@ -23,9 +23,13 @@ def get_subs_and_dubs():
         else:
             movie_data = run_all_movies(nf_dict)
 
-    run_all_pickles((Path(OUTPUT_FOLDER, 'pickles')))
+    return run_all_pickles((Path(OUTPUT_FOLDER, 'pickles')))
+
+
+def unogs_main():
+    setup_directories()
+    get_subs_and_dubs()
 
 
 if __name__ == '__main__':
-    setup_directories()
-    get_subs_and_dubs()
+    unogs_main()
