@@ -26,6 +26,8 @@ def chetflix_main():
     """
     Run WON Gatherer to get nf_dict.json
     
+    (If the nf_dict already exists, then allow to skip)
+    
     1. Chdir to src/won
     2. Run won/run/get_site_data and return file name
     3. copy won/output/file_name to compile/input/nf_dict.json
@@ -33,6 +35,17 @@ def chetflix_main():
     os.chdir(Path(src_dir, 'won'))
     file_path = get_site_data()
     copy_file(file_path, Path(compile_folder, 'nf_dict.json'))
+
+    """
+    Run Netflix Nametags to set up the identifiers
+    
+    1. Chdir to nametags
+    2. Run main
+    3. Copy output/netflix_nametags.json to unogs/inputs
+    4. Copy output/netflix_nametags.json to trends
+    5. Copy output/netflix_nametags.json to flix
+    6. Copy output/netflix_nametags.json to compile/inputs
+    """
 
     """
     Run UNOGS data
