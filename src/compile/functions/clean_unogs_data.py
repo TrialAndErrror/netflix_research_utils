@@ -18,19 +18,19 @@ REMOVE_LIST = [
 ]
 
 MANUAL_REMOVAL = [
-        'sub_Arabic (Saudi Arabia)',
-        'sub_Traditional Chinese (Hong Kong SAR China)',
-        'sub_Arabic (Egypt)',
-        'sub_Canadian French',
-        'sub_Serbian (Latin)',
-        'sub_Brazilian Portuguese',
-        'sub_Mandarin',
-        'sub_Mandarin (Guoyu)',
+        # 'sub_Arabic (Saudi Arabia)',
+        # 'sub_Traditional Chinese (Hong Kong SAR China)',
+        # 'sub_Arabic (Egypt)',
+        # 'sub_Canadian French',
+        # 'sub_Serbian (Latin)',
+        # 'sub_Brazilian Portuguese',
+        # 'sub_Mandarin',
+        # 'sub_Mandarin (Guoyu)',
         'dub_European Spanish [English-Delayed]',
         'dub_Polish - Dubbing',
-        'dub_Mandarin (Putonghua)',
+        # 'dub_Mandarin (Putonghua)',
         'dub_English [Hindi-Delayed]',
-        'dub_Polish - Lektor',
+        # 'dub_Polish - Lektor',
         'dub_European Spanish [English-Pending]',
         'dub_Brazilian Portuguese [English-Pending]',
         'dub_Hindi [English-Delayed]',
@@ -38,17 +38,17 @@ MANUAL_REMOVAL = [
         'dub_Hindi [English-Pending]',
         'dub_I',
         'dub_Polish -',
-        'dub_Mandarin (Guoyu)',
+        # 'dub_Mandarin (Guoyu)',
         'dub_Br',
-        'dub_Arabic (Palestine)',
+        # 'dub_Arabic (Palestine)',
         'dub_European Spanish - Dubbed',
         'dub_Brazilian Portuguese [English-Delayed]',
-        'dub_Arabic (Egypt)',
+        # 'dub_Arabic (Egypt)',
         'dub_Brazilian Portugues',
         'dub_Portugues',
-        'dub_Mexican Spanish',
+        # 'dub_Mexican Spanish',
         'dub_Spanish -',
-        'dub_Brazilian',
+        # 'dub_Brazilian',
         '',
 ]
 
@@ -124,40 +124,37 @@ def replace_columns(df):
         'sub_Arabic (Lebanon)': 'sub_Arabic',
         'sub_Traditional Chinese (Hong Kong SAR China)': 'sub_Traditional Chinese',
         'sub_Arabic (Saudi Arabia)': 'sub_Arabic',
+
         'dub_Mandarin (Putonghua)': 'dub_Mandarin',
-        'dub_Arabic (Egypt)': 'dub_Arabic',
         'dub_Arabic (Palestine)': 'dub_Arabic',
         'dub_Arabic (Syria)': 'dub_Arabic',
+        'dub_Arabic (Egypt)': 'dub_Arabic',
         'dub_Mandarin (Guoyu)': 'dub_Mandarin'
     }
 
     def consolidate_column(row, replace_dict):
+        # error_list = []
         for key, value in replace_dict.items():
             try:
                 row[value] = bool(row[key] or row[value])
-            except KeyError:
+            except KeyError as e:
+                # error_list.append(str(e))
                 pass
+        # error_list = list(set(error_list))
+        # print(f'Columns not found in dataset: {error_list}')
 
     def consolidate_all_columns(df):
-        df.apply(lambda x: consolidate_column(x, replace_dict))
-        for language in replace_dict.keys():
-            try:
-                sub_df = df.drop(language, axis=1)
-            except KeyError:
-                pass
+        df.apply(lambda x: consolidate_column(x, replace_dict), axis=1)
+        languages_to_drop = list(replace_dict.keys())
+        sub_df = df.drop(languages_to_drop, axis=1, errors='ignore')
         return sub_df
 
     return consolidate_all_columns(df)
 
 
-def clean_unogs(unogs_df_path='final_unogs_df.csv'):
-    unogs_df = pd.read_csv(unogs_df_path)
+def clean_unogs(unogs_df: pd.DataFrame):
     col_list = perform_all_cleaning(unogs_df.columns)
-
     cleaned_unogs_df = unogs_df[col_list]
     # cleaned_unogs_df.to_csv('clean_unogs_df.csv')
     return replace_columns(cleaned_unogs_df)
 
-
-if __name__ == '__main__':
-    clean_unogs()

@@ -69,29 +69,39 @@ def merge_unogs_and_google_trends(unogs_df, gt_data):
     return merge_with_gt(unogs_df, gt_data, '[p]unogs_and_gt.csv')
 
 
-def load_or_create_unogs_df():
+def load_or_create_unogs_df(nf_originals):
+    nf_slugs = [item['slug'] for item in nf_originals]
+
     print('\nLoading UNOGS Data')
     unogs_df_path = Path(PARTS_PATH, '[p]unogs_df.csv')
-
     if not unogs_df_path.exists():
-        unogs_df = clean_unogs(FILE_PATH['unogs'])
+        unogs_df = pd.read_csv(FILE_PATH['unogs'])
+        unogs_df = unogs_df[unogs_df['slug'].isin(nf_slugs)]
+        unogs_df = clean_unogs(unogs_df)
         unogs_df.to_csv(unogs_df_path)
     else:
         unogs_df = pd.read_csv(unogs_df_path)
 
-    return unogs_df
-
-
-def load_or_create_grouped_df(nf_originals, unogs_df):
     print('\nGrouping UNOGS Data')
     grouped_df_path = Path(PARTS_PATH, '[p]grp_unogs_df.csv')
-    nf_titles = [item['title'] for item in nf_originals]
     if not grouped_df_path.exists():
-        grouped_df = unogs_df.copy()
-        grouped_nf_df = grouped_df[grouped_df['title'].isin(nf_titles)]
-        grouped_df = perform_make_exclusive(grouped_nf_df)
+        grouped_df = perform_make_exclusive(unogs_df)
         grouped_df.to_csv(grouped_df_path)
     else:
         grouped_df = pd.read_csv(grouped_df_path)
 
-    return grouped_df
+    return unogs_df, grouped_df
+
+# def load_or_create_grouped_df(nf_originals, unogs_df):
+#     print('\nGrouping UNOGS Data')
+#     grouped_df_path = Path(PARTS_PATH, '[p]grp_unogs_df.csv')
+#     nf_slugs = [item['slug'] for item in nf_originals]
+#     if not grouped_df_path.exists():
+#         grouped_df = clean_unogs(unogs_df)
+#         grouped_nf_df = grouped_df[grouped_df['slug'].isin(nf_slugs)]
+#         grouped_df = perform_make_exclusive(grouped_nf_df)
+#         grouped_df.to_csv(grouped_df_path)
+#     else:
+#         grouped_df = pd.read_csv(grouped_df_path)
+#
+#     return grouped_df

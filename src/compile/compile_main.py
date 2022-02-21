@@ -1,8 +1,7 @@
 from pathlib import Path
 
 from src.compile.functions.utils import PARTS_PATH, FILE_PATH, check_for_required_files, create_output_folder, \
-    clean_col_names, merge_grouped_and_google_trends, merge_unogs_and_google_trends, load_or_create_unogs_df, \
-    load_or_create_grouped_df
+    clean_col_names, merge_grouped_and_google_trends, merge_unogs_and_google_trends, load_or_create_unogs_df
 from src.utils import read_file
 from src.compile.functions.clean_gt_data import clean_gt
 from src.compile.functions.clean_flix_top10 import clean_flixpatrol_data
@@ -26,10 +25,10 @@ def compile_main():
     """
     Load UNOGS dataframe and Google Trends Dataframe
     """
-    unogs_df = load_or_create_unogs_df()
-
     nf_nametags = read_file(FILE_PATH['nf_dict'])
-    grouped_df = load_or_create_grouped_df(nf_nametags, unogs_df)
+    unogs_df, grouped_df = load_or_create_unogs_df(nf_nametags)
+
+    # grouped_df = load_or_create_grouped_df(nf_nametags, unogs_df)
 
     """
     Load Google Trends Dataframe
