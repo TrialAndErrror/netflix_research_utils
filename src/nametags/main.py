@@ -10,7 +10,7 @@ def nametag_main():
     output_folder = Path(os.getcwd(), 'output')
     output_folder.mkdir(exist_ok=True)
 
-    input_folder = Path(os.getcwd(), 'input')
+    input_folder = Path(os.getcwd(), 'inputs')
     input_folder.mkdir(exist_ok=True)
 
     nf_dict = read_file(Path(input_folder, 'nf_dict.json'))

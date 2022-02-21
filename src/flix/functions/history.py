@@ -17,8 +17,8 @@ from src.utils import write_file
 def flix_history(nf_id_dict):
     missing_titles = []
 
-    for slug in nf_id_dict:
-        missing = get_data(slug, url='top10/', extra_folder='history')
+    for title in nf_id_dict:
+        missing = get_data(title['slug'], url='top10/', extra_folder='history')
 
         if missing:
             missing_titles.append(missing)

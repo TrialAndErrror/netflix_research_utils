@@ -2,13 +2,12 @@ import pandas as pd
 from pathlib import Path
 import os
 from src.utils import read_file
-from clean_gt_data import merge_unogs_and_gt, clean_gt
-from clean_flix_top10 import clean_flixpatrol_data
-from clean_flix_countries import clean_flix_countries
-from clean_unogs_data import clean_unogs
-from make_groups import perform_make_exclusive
+from src.compile.functions.clean_gt_data import merge_unogs_and_gt, clean_gt
+from src.compile.functions.clean_flix_top10 import clean_flixpatrol_data
+from src.compile.functions.clean_flix_countries import clean_flix_countries
+from src.compile.functions.clean_unogs_data import clean_unogs
+from src.compile.functions.make_groups import perform_make_exclusive
 from datetime import datetime
-from slugify import slugify
 
 INPUT_DIR_NAME = 'input'
 INPUT_PATH = Path(os.getcwd(), INPUT_DIR_NAME)
@@ -19,10 +18,10 @@ PARTS_PATH = Path(os.getcwd(), PARTS_DIR_NAME)
 FILE_PATH = {
     'unogs': Path(INPUT_PATH, 'final_unogs_df.csv'),
     'trends': Path(INPUT_PATH, 'google_trends_data.csv'),
-    'nf_dict': Path(INPUT_PATH, 'nf_dict.json'),
+    'nf_dict': Path(INPUT_PATH, 'netflix_nametags.json'),
     'flix_top10': Path(INPUT_PATH, 'history_results.json'),
     'flix_country': Path(INPUT_PATH, 'country_results.json'),
-    'slug_replace': Path(INPUT_PATH, 'slug_replace_dict.json')
+    # 'slug_replace': Path(INPUT_PATH, 'slug_replace_dict.json')
 }
 
 
@@ -36,7 +35,7 @@ def check_for_required_files():
 
 
 def create_output_folder():
-    output_folder = Path(os.getcwd(), f'Compile Results: {datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}')
+    output_folder = Path(os.getcwd(), 'output', f'Compile Results: {datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}')
     output_folder.mkdir(exist_ok=True)
     return output_folder
 
@@ -55,19 +54,19 @@ def compile_main():
     """
     check_for_required_files()
 
-    slug_dict = read_file(Path('input', 'slug_replace_dict.json'))
+    # slug_dict = read_file(Path('input', 'slug_replace_dict.json'))
 
     """
     Load UNOGS dataframe and Google Trends Dataframe
     """
     unogs_df = load_or_create_unogs_df()
 
-    unogs_df['slug'] = unogs_df['title'].apply(lambda x: slug_dict.get(x, slugify(x)))
+    # unogs_df['slug'] = unogs_df['title'].apply(lambda x: slug_dict.get(x, slugify(x)))
 
-    nf_originals = read_file(FILE_PATH['nf_dict'])
+    nf_nametags = read_file(FILE_PATH['nf_dict'])
     grouped_df = None
-    if nf_originals:
-        grouped_df = load_or_create_grouped_df(nf_originals, unogs_df)
+    if nf_nametags:
+        grouped_df = load_or_create_grouped_df(nf_nametags, unogs_df)
 
 
     """
@@ -75,7 +74,9 @@ def compile_main():
     """
     print('\nLoading Google Trends Data')
     gt_data = clean_gt(FILE_PATH['trends'])
-    gt_data['slug'] = gt_data['title'].apply(lambda x: slug_dict.get(x, slugify(x)))
+
+    # This should be unnecessary because gt data should include slug?
+    # gt_data['slug'] = gt_data['title'].apply(lambda x: slug_dict.get(x, slugify(x)))
 
     """
     Merge UNOGS and Google Trends data
@@ -182,9 +183,10 @@ def load_or_create_unogs_df():
 def load_or_create_grouped_df(nf_originals, unogs_df):
     print('\nGrouping UNOGS Data')
     grouped_df_path = Path(PARTS_PATH, '[p]grp_unogs_df.csv')
+    nf_titles = [item.title for item in nf_originals]
     if not grouped_df_path.exists():
         grouped_df = unogs_df.copy()
-        grouped_nf_df = grouped_df[grouped_df['title'].isin(nf_originals.keys())]
+        grouped_nf_df = grouped_df[grouped_df['title'].isin(nf_titles)]
         grouped_df = perform_make_exclusive(grouped_nf_df)
         grouped_df.to_csv(grouped_df_path)
     else:

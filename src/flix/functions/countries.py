@@ -17,8 +17,8 @@ from src.utils import write_file
 def flix_countries(nf_id_dict):
     missing_titles = []
 
-    for slug in nf_id_dict:
-        missing = get_data(slug, url='streaming/', extra_folder='country')
+    for title in nf_id_dict:
+        missing = get_data(title['slug'], url='streaming/', extra_folder='country')
 
         if missing:
             missing_titles.append(missing)

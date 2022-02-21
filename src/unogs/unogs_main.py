@@ -15,7 +15,7 @@ def get_subs_and_dubs():
 
     :return: None
     """
-    nf_dict = {item['slug']: item['nfid'] for item in load_from_json_data()}
+    nf_dict = load_from_json_data()
 
     if DEBUG:
         movie_data = run_with_limit(nf_dict)

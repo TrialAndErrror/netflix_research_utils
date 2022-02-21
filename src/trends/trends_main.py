@@ -1,33 +1,42 @@
 import pandas as pd
-from pytrends.request import TrendReq
 from pathlib import Path
 import datetime
 import pickle
 import os
-import json
+
 from pytrends.exceptions import ResponseError
+from pytrends.request import TrendReq
+
+from src.utils import read_file
 
 pytrend = TrendReq()
 
-PICKLE_FOLDER = Path(os.getcwd(), 'old_data/pickles')
+PICKLE_FOLDER = Path(os.getcwd(), 'pickles')
 
 
 def get_file_path(key, timeframe):
-    return Path(PICKLE_FOLDER, f'{key}: {timeframe}')
+    return Path(PICKLE_FOLDER, f'{key}: {timeframe}.pickle')
 
 
-def get_pytrends_data(keyword, timeframe, file_path):
-    pytrend.build_payload([keyword], timeframe=timeframe)
+def get_pytrends_data(keyword, slug, timeframe, file_path):
     try:
-        data = pytrend.interest_by_region(resolution='COUNTRY', inc_low_vol=True, inc_geo_code=False)
+        pytrend.build_payload([keyword], timeframe=timeframe)
     except ResponseError as e:
-        # data = f'Error: {e}'
-        print(f'Error with {keyword}')
+        try:
+            pytrend.build_payload([slug], timeframe=timeframe)
+        except ResponseError as e:
+            print(f'Error with {keyword}: {e}')
+            return None
     else:
-        with open(file_path, 'wb+') as outfile:
-            pickle.dump(data, outfile)
+        try:
+            data = pytrend.interest_by_region(resolution='COUNTRY', inc_low_vol=True, inc_geo_code=False)
+        except ResponseError as e:
+            print(f'Error with {keyword}')
+        else:
+            with open(file_path, 'wb+') as outfile:
+                pickle.dump(data, outfile)
 
-        return data
+            return data
 
 
 def read_pytrends_data(file_path):
@@ -38,26 +47,29 @@ def read_pytrends_data(file_path):
 
 
 def load_or_fetch_data(keyword, slug, timeframe):
-    if keyword == 'Unknown':
-        keyword = slug
+    if not str(timeframe) == 'nan':
 
-    file_path = get_file_path(keyword, timeframe)
+        if keyword == 'Unknown':
+            keyword = slug
 
-    print(f'Working on {keyword}')
-    if file_path.exists():
-        print('Pickle Found')
-        return read_pytrends_data(file_path)
-    else:
-        print('Fetching Data')
-        return get_pytrends_data(keyword, timeframe, file_path)
+        file_path = get_file_path(slug, timeframe)
+
+        print(f'Working on {keyword}')
+        if file_path.exists():
+            print('Pickle Found')
+            return read_pytrends_data(file_path)
+        else:
+            print('Fetching Data')
+            return get_pytrends_data(keyword, slug, timeframe, file_path)
 
 
 def process_df_line(df):
     keyword = df.title
+    slug = df.slug
     timeframe = df['Date Range']
     os.makedirs(PICKLE_FOLDER, exist_ok=True)
     print(f'({df["Unnamed: 0"]}) Working on {keyword}')
-    result = load_or_fetch_data(keyword, timeframe)
+    result = load_or_fetch_data(keyword, slug, timeframe)
     try:
         result = result.T.reset_index()
     except AttributeError:
@@ -66,7 +78,7 @@ def process_df_line(df):
 
 
 def create_date_range_column(df):
-    df['Premiere Date'] = pd.to_datetime(df['Premiere Date'])
+    df['Premiere Date'] = pd.to_datetime(df['date'])
     df['End Date'] = df['Premiere Date'] + datetime.timedelta(days=30)
     df['Date Range'] = df['Premiere Date'].dt.strftime('%Y-%m-%d') + " " + df['End Date'].dt.strftime('%Y-%m-%d')
     return df
@@ -78,22 +90,13 @@ def debug():
     process_df_line(total_df.loc[0])
 
 
-def run_trends_data():
-    output_dir = Path(os.getcwd(), 'old_data/results')
-    output_dir.mkdir(exist_ok=True)
-    premiere_dates_df = pd.read_csv('./premiere_dates_df.csv')
-    total_df = create_date_range_column(premiere_dates_df)
-    applied_df = total_df.apply(lambda df_param: process_df_line(df_param), axis=1, result_type='expand')
-    df = pd.concat([total_df, applied_df], axis='columns')
-    df.to_csv(Path(output_dir, 'trends_data_output.csv'))
-
-
 def process_df_lines(df):
-    results = [
-        load_or_fetch_data(title, slug, timeframe).T
-        for title, timeframe, slug
-        in zip(df['title'], df['Date Range'], df['slug'])
-    ]
+    results = []
+
+    for title, timeframe, slug in zip(df['title'], df['Date Range'], df['slug']):
+        data = load_or_fetch_data(title, slug, timeframe)
+        if isinstance(data, pd.DataFrame):
+            results.append(data.T)
 
     return pd.concat(results)
 
@@ -102,12 +105,14 @@ def trends_main():
     # run_trends_data()
     print('Starting Google Trends processing...')
 
-    output_dir = Path(os.getcwd(), 'old_data/results')
+    output_dir = Path(os.getcwd(), 'results')
     output_dir.mkdir(exist_ok=True)
+    PICKLE_FOLDER.mkdir(exist_ok=True)
 
     print('Making Date Range Columns')
-    premiere_dates_df = pd.read_csv('./premiere_dates_df.csv')
-    total_df = create_date_range_column(premiere_dates_df)
+
+    netflix_titles_df = pd.DataFrame(read_file(Path(os.getcwd(), 'netflix_nametags.json')))
+    total_df = create_date_range_column(netflix_titles_df)
 
     print('Fetching Data')
     new_df = process_df_lines(total_df)

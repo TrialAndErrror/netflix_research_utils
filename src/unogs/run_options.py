@@ -6,7 +6,7 @@ from src.unogs.file_commands import load_pickle, save_pickle
 from slugify import slugify
 
 
-def process_movie_entry(driver: webdriver, nfid: str, slug: str):
+def process_movie_entry(driver: webdriver, nfid: str, slug: str, title: str):
     """
     Process one movie entry
 
@@ -34,6 +34,7 @@ def process_movie_entry(driver: webdriver, nfid: str, slug: str):
         data = {
             'nfid': nfid,
             'slug': slug,
+            'title': title
         }
         languages = process_region_blocks(driver, region_blocks, slug)
         data['languages'] = languages
@@ -46,13 +47,13 @@ def process_movie_entry(driver: webdriver, nfid: str, slug: str):
         return None
 
 
-def run_with_limit(nf_dict: dict):
+def run_with_limit(netflix_nametags: list):
     """
     Loop through all NetFlix titles in nf_dict and get subs and dubs.
 
     Uses MAX_COUNT to limit number of movies to fetch.
 
-    :param nf_dict: dict
+    :param netflix_nametags: list
     :return: dict
     """
 
@@ -69,11 +70,15 @@ def run_with_limit(nf_dict: dict):
     """
     Process each movie in the dictionary.
     """
-    for title, nfid in nf_dict.items():
+    for item in netflix_nametags:
+        slug = item['slug']
+        title = item['title']
+        nfid = item['nfid']
+
         """
         Notify user that the program is still running
         """
-        print(f'Working on {title}: [{count}/{total_count}]')
+        print(f'Working on {slug}: [{count}/{total_count}]')
 
         """
         Try to load data from pickle.
@@ -81,9 +86,9 @@ def run_with_limit(nf_dict: dict):
         """
 
         try:
-            data = load_pickle(f'{slugify(title)}.pickle')
+            data = load_pickle(f'{slug}.pickle')
         except FileNotFoundError:
-            result = process_movie_entry(driver, nfid, title)
+            result = process_movie_entry(driver, nfid, slug, title)
         else:
             result = data.get('languages')
 
@@ -92,7 +97,7 @@ def run_with_limit(nf_dict: dict):
         If result found, we save it in the movie_data dictionary.
         """
         if result:
-            movie_data[title] = result
+            movie_data[slug] = result
         """
         Count keeps track of number of movies processed.
         Set DEBUG to False to allow it to process the entire file.
@@ -111,11 +116,11 @@ def run_with_limit(nf_dict: dict):
     return movie_data
 
 
-def run_all_movies(nf_dict: dict):
+def run_all_movies(netflix_nametags: list):
     """
     Loop through all NetFlix titles in nf_dict and get subs and dubs.
 
-    :param nf_dict: dict
+    :param netflix_nametags: list
     :return: dict
     """
 
@@ -128,17 +133,21 @@ def run_all_movies(nf_dict: dict):
 
     movie_data = {}
     count = 1
-    total_count = len(nf_dict)
+    total_count = len(netflix_nametags)
     """
     Process each movie in the dictionary.
     """
-    for slug, nfid in nf_dict.items():
+    for item in netflix_nametags:
+        slug = item['slug']
+        title = item['title']
+        nfid = item['nfid']
+
         print(f'Working on {slug}: [{count}/{total_count}]')
         result = None
         try:
             data = load_pickle(f'{slug}.pickle')
         except FileNotFoundError:
-            result = process_movie_entry(driver, nfid, slug)
+            result = process_movie_entry(driver, nfid, slug, title)
         else:
             if isinstance(result, dict):
                 result = data.get('languages')
@@ -148,7 +157,7 @@ def run_all_movies(nf_dict: dict):
         If result found, we save it in the movie_data dictionary.
         """
         if result:
-            movie_data[title] = result
+            movie_data[slug] = result
 
         count += 1
 

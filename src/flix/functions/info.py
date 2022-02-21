@@ -29,13 +29,13 @@ def flix_info(nf_id_dict):
     Loop over all titles
     """
     count = 1
-    for slug in nf_id_dict:
+    for title in nf_id_dict:
         print(f'{count}/{total_count}')
 
         """
         Check if data is present by looking for "Missing Data" string in page
         """
-        missing = get_data(slug, url='', extra_folder='info')
+        missing = get_data(title['slug'], url='', extra_folder='info')
 
         if missing:
             """

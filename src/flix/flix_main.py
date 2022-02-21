@@ -28,11 +28,11 @@ def run_all(nf_id_dict):
     """
     setup_directories()
 
-    """
-    Update titles where the slug does not match the FlixPatrol url.
-    """
-    slug_replace_dict, nf_id_dict = slugify_nf_dict(nf_id_dict)
-    write_file(slug_replace_dict, Path(SUMMARY_DIR, 'slug_replace_dict.json'))
+    # """
+    # Update titles where the slug does not match the FlixPatrol url.
+    # """
+    # slug_replace_dict, nf_id_dict = slugify_nf_dict(nf_id_dict)
+    # write_file(slug_replace_dict, Path(SUMMARY_DIR, 'slug_replace_dict.json'))
 
     """
     Gather all pickles from FlixPatrol data.
@@ -47,6 +47,8 @@ def run_all(nf_id_dict):
     """
     Process pickles into DataFrames.
     """
+    slug_replace_dict = {item['slug']: item['title'] for item in nf_id_dict}
+
     make_info_dfs(slug_replace_dict)
     make_history_dfs(slug_replace_dict)
     make_country_dfs(slug_replace_dict)
@@ -63,12 +65,14 @@ def flixpatrol_main():
     :return: None
     """
     os.makedirs(PICKLE_DIR, exist_ok=True)
-    nf_dict_path = Path(os.getcwd(), 'nf_dict.json')
+    nf_dict_path = Path(os.getcwd(), 'netflix_nametags.json')
     if nf_dict_path.exists():
         data = read_file(nf_dict_path)
         run_all(data)
     else:
-        raise FileNotFoundError('Missing nf_dict.json; cannot continue without list of Netflix Originals titles.')
+        raise FileNotFoundError(
+            'Missing netflix_nametags.json; cannot continue without list of Netflix Originals titles.'
+        )
 
 
 if __name__ == '__main__':
