@@ -40,8 +40,7 @@ def clean_gt(file_path):
     Rename country columns with gt_ prefix.
     """
     gt_data = pd.read_csv(file_path)
-    col_dict = {item: f'gt_{item}' for item in gt_data.columns}
-    col_dict['Unnamed: 0'] = 'slug'
+    col_dict = {item: f'gt_{item}' for item in gt_data.columns if item != 'slug'}
     gt_data = gt_data.rename(col_dict, axis=1)
 
     return gt_data

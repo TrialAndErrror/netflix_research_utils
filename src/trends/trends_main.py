@@ -116,6 +116,10 @@ def trends_main():
 
     print('Fetching Data')
     new_df = process_df_lines(total_df)
+    slug_lookup_dict = {item['title']: item['slug'] for item in read_file(Path('netflix_nametags.json'))}
+    new_df = new_df.rename_axis('title').reset_index()
+    new_df['slug'] = new_df['title'].apply(lambda x: slug_lookup_dict.get(x))
+
     new_df.to_csv(Path(output_dir, 'trends_data_output.csv'))
     return output_dir
 
