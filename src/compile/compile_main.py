@@ -8,6 +8,7 @@ from clean_flix_countries import clean_flix_countries
 from clean_unogs_data import clean_unogs
 from make_groups import perform_make_exclusive
 from datetime import datetime
+from slugify import slugify
 
 INPUT_DIR_NAME = 'input'
 INPUT_PATH = Path(os.getcwd(), INPUT_DIR_NAME)
@@ -19,8 +20,9 @@ FILE_PATH = {
     'unogs': Path(INPUT_PATH, 'final_unogs_df.csv'),
     'trends': Path(INPUT_PATH, 'google_trends_data.csv'),
     'nf_dict': Path(INPUT_PATH, 'nf_dict.json'),
-    'flix_top10': Path(INPUT_PATH, '!!!history_df_results!!!.pickle'),
-    'flix_country': Path(INPUT_PATH, '!!!language_df_results!!!.pickle')
+    'flix_top10': Path(INPUT_PATH, 'history_results.json'),
+    'flix_country': Path(INPUT_PATH, 'country_results.json'),
+    'slug_replace': Path(INPUT_PATH, 'slug_replace_dict.json')
 }
 
 
@@ -53,21 +55,27 @@ def compile_main():
     """
     check_for_required_files()
 
+    slug_dict = read_file(Path('input', 'slug_replace_dict.json'))
+
     """
     Load UNOGS dataframe and Google Trends Dataframe
     """
     unogs_df = load_or_create_unogs_df()
+
+    unogs_df['slug'] = unogs_df['title'].apply(lambda x: slug_dict.get(x, slugify(x)))
 
     nf_originals = read_file(FILE_PATH['nf_dict'])
     grouped_df = None
     if nf_originals:
         grouped_df = load_or_create_grouped_df(nf_originals, unogs_df)
 
+
     """
     Load Google Trends Dataframe
     """
     print('\nLoading Google Trends Data')
     gt_data = clean_gt(FILE_PATH['trends'])
+    gt_data['slug'] = gt_data['title'].apply(lambda x: slug_dict.get(x, slugify(x)))
 
     """
     Merge UNOGS and Google Trends data
@@ -105,7 +113,7 @@ def compile_main():
         grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_top10_and_countries.csv'))
 
     """
-    Be sure to remove any unnecesary columns before saving.
+    Be sure to remove any unnecessary columns before saving.
     """
     final_df, grouped_df = clean_col_names(final_df, grouped_df)
 

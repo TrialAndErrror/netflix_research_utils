@@ -20,7 +20,7 @@ ALT_DUB_LIST_SUFFIX = '/div/div[2]'
 ALT_SUB_LIST_SUFFIX = '/div/div[3]'
 
 
-def click_more_button(driver: webdriver, xpath: str, title: str):
+def click_more_button(driver: webdriver, xpath: str, slug: str):
     """
     Find and click the "more" button for Subbed or Dubbed languages list.
 
@@ -35,7 +35,7 @@ def click_more_button(driver: webdriver, xpath: str, title: str):
 
     :param driver: Webdriver
     :param xpath: str
-    :param title: str
+    :param slug: str
     :return: None
     """
 
@@ -49,16 +49,16 @@ def click_more_button(driver: webdriver, xpath: str, title: str):
         the "more" button was not found, this would indicate an actual issue.
         """
         logging.debug(f'Button at {xpath} not interactable.')
-        logging.debug(f'Looks like {title} may have limited language availability')
+        logging.debug(f'Looks like {slug} may have limited language availability')
 
 
-def process_region_blocks(driver: webdriver, region_blocks: list, title: str):
+def process_region_blocks(driver: webdriver, region_blocks: list, slug: str):
     """
     Process all region blocks for a given movie page
 
     :param driver: Webdriver
     :param region_blocks: list(str, Webdriver.element)
-    :param title: str
+    :param slug: str
     :return: dict
     """
     languages = {}
@@ -84,8 +84,8 @@ def process_region_blocks(driver: webdriver, region_blocks: list, title: str):
         """
         If there is a "more" button in the list of Subs and/or Dubs, click it.
         """
-        click_more_button(driver, subs_div_xpath, title)
-        click_more_button(driver, dubs_div_xpath, title)
+        click_more_button(driver, subs_div_xpath, slug)
+        click_more_button(driver, dubs_div_xpath, slug)
 
         """
         Get the element for the Subs div and Dubs div using its XPATH.

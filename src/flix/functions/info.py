@@ -6,7 +6,7 @@ from typing import Tuple
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.flix import PICKLE_DIR
+from src.flix import PICKLE_DIR, SUMMARY_DIR
 from src.flix.utils.debug_messages import print_green
 from src.flix.functions.utils import check_for_missing_data
 from src.flix.utils.network import get_data
@@ -35,7 +35,7 @@ def flix_info(nf_id_dict):
         """
         Check if data is present by looking for "Missing Data" string in page
         """
-        missing = get_data(slug, url='', extra_folder='language')
+        missing = get_data(slug, url='', extra_folder='info')
 
         if missing:
             """
@@ -77,7 +77,7 @@ def read_info_soup(filename) -> (str, Tuple[str, pd.DataFrame], str):
         if netflix_table:
             html_snippet = str(netflix_table)
             data = pd.read_html(html_snippet)
-            results = ('Netflix Info', data[0])
+            results = data[0]
 
     """
     Look for Premiere Date;
@@ -95,7 +95,7 @@ def read_info_soup(filename) -> (str, Tuple[str, pd.DataFrame], str):
     return title, results, result_date
 
 
-def make_info_dfs():
+def make_info_dfs(slug_replace_dict):
     """
     Make Dataframes from all Info Pickles.
 
@@ -122,7 +122,7 @@ def make_info_dfs():
 
             title, results, premiere_date = read_info_soup(file)
 
-            if isinstance(results, tuple):
+            if isinstance(results, pd.DataFrame):
                 print_green(f'Found Info data for {title}')
                 info_dict[title] = results
 
@@ -138,31 +138,27 @@ def make_info_dfs():
     Save results as JSON and Pickle.
     """
     save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='summary')
-    save_top10_dict(info_dict, '!!!info_df_results!!!.json')
+    save_top10_dict(info_dict, 'info_results.json')
 
     """
     Save premiere dates as CSV Dataframe and Pickle.
     """
-    save_premiere_dates_df(premiere_dict)
+    title_replace_dict = {v: k for k, v in slug_replace_dict.items()}
+    save_premiere_dates_df(premiere_dict, title_replace_dict)
 
 
-def save_premiere_dates_df(premiere_dict):
+def save_premiere_dates_df(premiere_dict, title_replace_dict):
     premiere_df = pd.DataFrame.from_records(premiere_dict).infer_objects()
     premiere_df['Premiere Date'] = pd.to_datetime(premiere_df['Premiere Date'], format='%m/%d/%Y')
-    valid_df = premiere_df[premiere_df['Premiere Date'] > '01/01/2004']
-    valid_df.to_csv('./pickle_jar/summary/premiere_dates_df.csv')
 
-    # save_pickle(premiere_dict, '!!!premiere_dates!!!', extra_folder='summary')
+    valid_df = premiere_df[premiere_df['Premiere Date'] > '01/01/2004']
+
+    valid_df = valid_df.rename({'title': 'slug'}, axis=1)
+    valid_df['title'] = valid_df['slug'].apply(lambda x: title_replace_dict.get(x, 'Unknown'))
+
+    valid_df.to_csv(Path(SUMMARY_DIR, 'premiere_dates_df.csv'))
 
 
 def save_top10_dict(data, filename):
-    export_dict = {}
-    for title, data_tuple in data.items():
-        export_dict[title] = {}
-
-        chart_type = data_tuple[0]
-        df_list = data_tuple[1]
-
-        export_dict[title][chart_type] = df_list.to_json()
-
-    write_file(export_dict, Path(os.getcwd(), PICKLE_DIR, 'summary', filename))
+    export_dict = {title: df.to_dict() for title, df in data.items()}
+    write_file(export_dict, Path(os.getcwd(), SUMMARY_DIR, filename))

@@ -130,7 +130,7 @@ class PickleReader:
             for column in dub_columns:
                 entry[column] = bool(column.split('_')[1] in lang_dict.get('Dub', list()))
 
-            entry['slug'] = slugify(self.title)
+            # entry['slug'] = slugify(self.title)
 
             entry_list.append(entry)
 

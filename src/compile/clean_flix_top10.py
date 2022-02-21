@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from src.flix.utils import load_pickle
+from src.utils import read_file
 
 ALL_COUNTRIES = [
     'Argentina',
@@ -81,8 +81,8 @@ def reform_dict(dict):
 
 
 def make_into_dataframe(dict):
-    data = reform_dict(dict)
-    return pd.DataFrame.from_dict(data).T
+    df = pd.DataFrame.from_dict(dict, orient="index").stack().to_frame()
+    return pd.DataFrame(df[0].values.tolist(), index=df.index)
 
 
 def clean_flixpatrol_columns(dataframe, title):
@@ -101,80 +101,36 @@ def clean_netflix_columns(dataframe, title):
 
 
 def prepare_dataframes_to_join(cleaned_movies_history):
-    netflix_overall = {}
-    netflix_movies = {}
-    netflix_official = {}
-    netflix_kids = {}
-
-    for movie in cleaned_movies_history:
-        netflix_overall[movie] = cleaned_movies_history[movie].get('Netflix Overall')
-        netflix_movies[movie] = cleaned_movies_history[movie].get('Netflix Movies')
-        netflix_official[movie] = cleaned_movies_history[movie].get('Netflix Official')
-        netflix_kids[movie] = cleaned_movies_history[movie].get('Netflix Kids')
-
     clean_netflix_overall_df = clean_flixpatrol_columns(
         make_into_dataframe(
-            replace_indices_with_country(netflix_overall)
-        ), 'Overall')
-
-    clean_netflix_movies_df = clean_flixpatrol_columns(
-        make_into_dataframe(
-            replace_indices_with_country(netflix_movies)
+            replace_indices_with_country(cleaned_movies_history)
         ), 'Movies')
 
-    clean_netflix_kids_df = clean_flixpatrol_columns(
-        make_into_dataframe(
-            replace_indices_with_country(netflix_kids)
-        ), 'Kids')
-
-    clean_netflix_official_df = clean_netflix_columns(
-        make_into_dataframe(
-            replace_indices_with_country(netflix_official)
-        ), 'Official')
-
-    return [
-        clean_netflix_overall_df,
-        clean_netflix_movies_df,
-        clean_netflix_kids_df,
-        clean_netflix_official_df
-    ]
+    return clean_netflix_overall_df
 
 
 def clean_flixpatrol_data(history_file):
-    history_data = load_pickle(history_file)
+    history_data = read_file(history_file)
 
     cleaned_movies_history = {}
 
     for key, value in history_data.items():
         cleaned_movies_history[key] = {}
-        for data_tuple in value:
-            data_dict = data_tuple[1][0].to_dict()
-            data_dict = add_missing_countries_to_data_dict(data_dict)
-            cleaned_movies_history[key][data_tuple[0]] = data_dict
+        data_dict = add_missing_countries_to_data_dict(value)
+        cleaned_movies_history[key] = data_dict
 
-    dataframes_to_join = prepare_dataframes_to_join(cleaned_movies_history)
+    dataframe = prepare_dataframes_to_join(cleaned_movies_history)
 
-    overall_df = dataframes_to_join[0].join(dataframes_to_join[1:], how="outer")
-    mergeable_flix = overall_df.reset_index()
-    return mergeable_flix
+    return dataframe.reset_index()
 
 
 def add_missing_countries_to_data_dict(data_dict):
     for country in ALL_COUNTRIES:
         if country not in data_dict['Country'].values():
-            if 'Days' in data_dict.keys():                              # FlixPatrol Top 10 list
-                index_num = len(data_dict['Country'])
-                data_dict['Country'][index_num] = country
-                data_dict['Points'][index_num] = 0
-                data_dict['Unnamed: 2'][index_num] = np.nan
-                data_dict['Days'][index_num] = '0 days'
-                data_dict['ø/day'][index_num] = 0.0
-            else:                                                       # Netflix Top 10 list
-                index_num = len(data_dict['Country'])
-                data_dict['Country'][index_num] = country
-                data_dict['Points'][index_num] = 0
-                data_dict['Points.1'][index_num] = np.nan
-                data_dict['Weeks'][index_num] = 0
-                data_dict['Weeks.1'][index_num] = '/'
-
+            index_num = len(data_dict['Country'])
+            data_dict['Country'][index_num] = country
+            data_dict['Points'][index_num] = 0
+            data_dict['Unnamed: 2'][index_num] = np.nan
+            data_dict['Days'][index_num] = '0 days'
+            data_dict['ø/day'][index_num] = 0.0
     return data_dict

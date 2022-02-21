@@ -6,13 +6,13 @@ from src.unogs.file_commands import load_pickle, save_pickle
 from slugify import slugify
 
 
-def process_movie_entry(driver: webdriver, nfid: str, title: str):
+def process_movie_entry(driver: webdriver, nfid: str, slug: str):
     """
     Process one movie entry
 
     :param driver: Webdriver
     :param nfid: str
-    :param title: str
+    :param slug: str
     :return: None
     """
 
@@ -33,16 +33,16 @@ def process_movie_entry(driver: webdriver, nfid: str, title: str):
     if len(region_blocks) > 0:
         data = {
             'nfid': nfid,
-            'title': title,
+            'slug': slug,
         }
-        languages = process_region_blocks(driver, region_blocks, title)
+        languages = process_region_blocks(driver, region_blocks, slug)
         data['languages'] = languages
-        save_pickle(data, f'{slugify(title)}.pickle')
+        save_pickle(data, f'{slug}.pickle')
 
         return languages
     else:
         data = None
-        save_pickle(data, f'{slugify(title)}.pickle')
+        save_pickle(data, f'{slug}.pickle')
         return None
 
 
@@ -132,13 +132,13 @@ def run_all_movies(nf_dict: dict):
     """
     Process each movie in the dictionary.
     """
-    for title, nfid in nf_dict.items():
-        print(f'Working on {title}: [{count}/{total_count}]')
+    for slug, nfid in nf_dict.items():
+        print(f'Working on {slug}: [{count}/{total_count}]')
         result = None
         try:
-            data = load_pickle(f'{slugify(title)}.pickle')
+            data = load_pickle(f'{slug}.pickle')
         except FileNotFoundError:
-            result = process_movie_entry(driver, nfid, title)
+            result = process_movie_entry(driver, nfid, slug)
         else:
             if isinstance(result, dict):
                 result = data.get('languages')

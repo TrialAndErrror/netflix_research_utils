@@ -1,14 +1,17 @@
 import glob
+import os
 from pathlib import Path
 from typing import Optional, List, Text
 
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.flix import PICKLE_DIR
+from src.flix import PICKLE_DIR, SUMMARY_DIR
 from src.flix.utils.debug_messages import print_red, print_green
-from src.flix.utils.pickle import save_pickle
+from src.flix.utils.pickle_utils import save_pickle, load_pickle
 from src.flix.utils.network import get_data
+
+from src.utils import write_file
 
 
 def flix_countries(nf_id_dict):
@@ -68,7 +71,7 @@ def read_country_soup(filename) -> (Text, List):
     return title, results
 
 
-def make_country_dfs(dir=PICKLE_DIR):
+def make_country_dfs(slug_replace_dict):
     """
     Make Dataframes from all Country Pickles.
 
@@ -82,7 +85,7 @@ def make_country_dfs(dir=PICKLE_DIR):
     """
     print('Working on Languages')
     country_dict = {}
-    country_files = glob.glob(f'{dir}/language/*.pickle')
+    country_files = glob.glob(f'{PICKLE_DIR}/language/*.pickle')
     files_count = len(country_files)
     counter = 1
 
@@ -98,4 +101,5 @@ def make_country_dfs(dir=PICKLE_DIR):
                 country_dict[title] = results
 
         counter += 1
-    save_pickle(country_dict, '!!!language_df_results!!!', extra_folder='summary')
+
+    write_file(country_dict, Path(SUMMARY_DIR, 'country_results.json'))

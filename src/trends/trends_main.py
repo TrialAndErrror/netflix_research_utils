@@ -9,7 +9,7 @@ from pytrends.exceptions import ResponseError
 
 pytrend = TrendReq()
 
-PICKLE_FOLDER = Path(os.getcwd(), 'pickles')
+PICKLE_FOLDER = Path(os.getcwd(), 'old_data/pickles')
 
 
 def get_file_path(key, timeframe):
@@ -37,12 +37,18 @@ def read_pytrends_data(file_path):
     return data
 
 
-def load_or_fetch_data(keyword, timeframe):
+def load_or_fetch_data(keyword, slug, timeframe):
+    if keyword == 'Unknown':
+        keyword = slug
+
     file_path = get_file_path(keyword, timeframe)
 
+    print(f'Working on {keyword}')
     if file_path.exists():
+        print('Pickle Found')
         return read_pytrends_data(file_path)
     else:
+        print('Fetching Data')
         return get_pytrends_data(keyword, timeframe, file_path)
 
 
@@ -73,7 +79,7 @@ def debug():
 
 
 def run_trends_data():
-    output_dir = Path(os.getcwd(), 'results')
+    output_dir = Path(os.getcwd(), 'old_data/results')
     output_dir.mkdir(exist_ok=True)
     premiere_dates_df = pd.read_csv('./premiere_dates_df.csv')
     total_df = create_date_range_column(premiere_dates_df)
@@ -84,9 +90,9 @@ def run_trends_data():
 
 def process_df_lines(df):
     results = [
-        load_or_fetch_data(title, timeframe).T
-        for title, timeframe
-        in zip(df['title'], df['Date Range'])
+        load_or_fetch_data(title, slug, timeframe).T
+        for title, timeframe, slug
+        in zip(df['title'], df['Date Range'], df['slug'])
     ]
 
     return pd.concat(results)
@@ -94,12 +100,17 @@ def process_df_lines(df):
 
 def trends_main():
     # run_trends_data()
-    output_dir = Path(os.getcwd(), 'results')
+    print('Starting Google Trends processing...')
+
+    output_dir = Path(os.getcwd(), 'old_data/results')
     output_dir.mkdir(exist_ok=True)
+
+    print('Making Date Range Columns')
     premiere_dates_df = pd.read_csv('./premiere_dates_df.csv')
     total_df = create_date_range_column(premiere_dates_df)
+
+    print('Fetching Data')
     new_df = process_df_lines(total_df)
-    print('stop')
     new_df.to_csv(Path(output_dir, 'trends_data_output.csv'))
     return output_dir
 

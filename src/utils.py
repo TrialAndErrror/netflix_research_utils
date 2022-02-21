@@ -12,9 +12,9 @@ def read_file(filename: Path):
         return None
 
 
-def write_file(data: dict, filename: Path):
+def write_file(data: dict or list, filename: Path):
     with open(filename, 'w+') as file:
-        json.dump(data, file)
+        json.dump(data, file, indent=4)
 
 
 def copy_file(file_path, dest_path):

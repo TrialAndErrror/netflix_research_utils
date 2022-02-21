@@ -5,11 +5,13 @@ from typing import List, Tuple, Text
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.flix import PICKLE_DIR
+from src.flix import PICKLE_DIR, SUMMARY_DIR
 from src.flix.utils.debug_messages import print_red, print_green
 from src.flix.functions.utils import check_for_missing_data
 from src.flix.utils.network import get_data
-from src.flix.utils.pickle import save_pickle, load_pickle
+from src.flix.utils.pickle_utils import save_pickle, load_pickle
+
+from src.utils import write_file
 
 
 def flix_history(nf_id_dict):
@@ -23,25 +25,22 @@ def flix_history(nf_id_dict):
             save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
 
 
-def get_history_tables(soup: BeautifulSoup) -> List[Tuple[str, pd.DataFrame]]:
+def get_history_tables(soup: BeautifulSoup) -> pd.DataFrame:
     """
-    Read soup and search for Netflix Top 10 History tables;
-    return a list if any tables are found
+    Read soup and search for Netflix Movies Top 10 table;
+    return the table if found
 
     :param soup: BeautifulSoup
-    :return:
+    :return: pd.DataFrame
     """
-    results_list = []
-
     netflix_movies = soup.select('#toc-netflix-2')
 
     if netflix_movies:
         html_snippet = str(netflix_movies)
         data = pd.read_html(html_snippet)
-        results_list.append(('Netflix Movies', data[0]))
 
-    if len(results_list) > 0:
-        return results_list
+        if data:
+            return data[0]
 
 
 def read_history_soup(filename) -> (Text, List[Tuple[str, pd.DataFrame]]):
@@ -75,7 +74,7 @@ def read_history_soup(filename) -> (Text, List[Tuple[str, pd.DataFrame]]):
     return title, results
 
 
-def make_history_dfs():
+def make_history_dfs(slug_replace_dict):
     """
     Make Dataframes from all History Pickles.
 
@@ -100,7 +99,7 @@ def make_history_dfs():
         if not file.split('/')[-1].startswith('!!!'):
             print(f'Working on {counter}/{files_count}')
             title, results = read_history_soup(file)
-            if isinstance(results, list):
+            if isinstance(results, pd.DataFrame):
                 print_green(f'Found History data for {title}')
                 history_dict[title] = results
 
@@ -112,8 +111,9 @@ def make_history_dfs():
     save_pickle(history_dict, '!!!history_df_results!!!', extra_folder='summary')
 
     """
-    Save just Netflix Movies as a CSV Dataframe.
+    Save just Netflix Movies as a JSON object.
     """
-    for title, df in history_dict:
-        result = df.to_dict()
-    raise NotImplementedError
+    # title_replace_dict = {v: k for k, v in slug_replace_dict.items()}
+    #
+    history_json = {title: df.to_dict() for title, df in history_dict.items()}
+    write_file(history_json, Path(SUMMARY_DIR, 'history_results.json'))

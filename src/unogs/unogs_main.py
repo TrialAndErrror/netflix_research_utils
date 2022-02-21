@@ -15,13 +15,12 @@ def get_subs_and_dubs():
 
     :return: None
     """
-    nf_dict = load_from_json_data('api_data.json')
-    if nf_dict:
+    nf_dict = {item['slug']: item['nfid'] for item in load_from_json_data()}
 
-        if DEBUG:
-            movie_data = run_with_limit(nf_dict)
-        else:
-            movie_data = run_all_movies(nf_dict)
+    if DEBUG:
+        movie_data = run_with_limit(nf_dict)
+    else:
+        movie_data = run_all_movies(nf_dict)
 
     return run_all_pickles(PICKLE_FOLDER)
 

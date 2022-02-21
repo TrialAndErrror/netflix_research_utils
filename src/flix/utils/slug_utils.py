@@ -4,28 +4,19 @@ from slugify import slugify
 
 
 def slugify_nf_dict(nf_id_dict):
-    # slug_to_titles_dict = {slugify(key): key for key in nf_id_dict}
-
-    new_dict = {slugify(key): value for key, value in nf_id_dict.items()}
-    return update_movie_titles(new_dict)
-
-    # return slug_to_titles_dict, update_movie_titles(new_dict)
-
-
-def update_movie_titles(nf_dict) -> dict:
-    """
-    Update slugs for movie titles that do not have an intuitive slug.
-
-    :param nf_dict: dict
-    :return: dict
-    """
+    dict_from_csv = pd.read_csv('replacements.csv', header=None, index_col=0, squeeze=True).to_dict()
 
     """
-    Read sheet of changes to dictionary using Pandas
+    Handle the slug_to_titles dict, which gives us a mapping between titles and actual slugs
     """
-    dict_from_csv = pd.read_csv('../replacements.csv', header=None, index_col=0, squeeze=True).to_dict()
+    slug_to_titles_dict = {
+        key: dict_from_csv.get(slugify(key), slugify(key))      # Run the slug through the dict, or just save slug
+        for key in nf_id_dict
+    }
 
-    for old_title, new_title in dict_from_csv.items():
-        nf_dict[new_title] = nf_dict.pop(old_title)
+    """
+    Handle the new_dict, which maps slug to netflix IDs.
+    """
+    new_dict = {dict_from_csv.get(slugify(key), slugify(key)): value for key, value in nf_id_dict.items()}
 
-    return nf_dict
+    return slug_to_titles_dict, new_dict

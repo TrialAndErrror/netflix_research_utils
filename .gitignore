@@ -14,7 +14,7 @@
 **/*.patch
 
 /src/flix/pickle_jar/
-/src/trends/pickles/
+/src/trends/old_data/pickles/
 /src/won/output/
 /tiffany_movie_urls.txt
 /tiffany_movies.txt

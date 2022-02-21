@@ -1,10 +1,9 @@
-from src.flix.utils import load_pickle
+from src.utils import read_file
 import pandas as pd
 
 
 def clean_flix_countries(file_path):
-    country_info = load_pickle(file_path)
-
+    country_info = read_file(file_path)
     total_countries = []
 
     for item in country_info.values():
