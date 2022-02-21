@@ -131,21 +131,13 @@ def replace_columns(df):
         'dub_Mandarin (Guoyu)': 'dub_Mandarin'
     }
 
-    def consolidate_column(row, replace_dict):
+    def consolidate_all_columns(df):
         for key, value in replace_dict.items():
             try:
-                row[value] = bool(row[key] or row[value])
+                df[value] = df.apply(lambda x: bool(x.get(key, False) or x.get(value, False)), axis=1)
             except KeyError:
                 pass
-
-    def consolidate_all_columns(df):
-        df.apply(lambda x: consolidate_column(x, replace_dict))
-        for language in replace_dict.keys():
-            try:
-                sub_df = df.drop(language, axis=1)
-            except KeyError:
-                pass
-        return sub_df
+        return df.drop(list(replace_dict.keys()), axis=1, errors='ignore')
 
     return consolidate_all_columns(df)
 
