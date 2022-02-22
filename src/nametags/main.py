@@ -22,22 +22,29 @@ def nametag_main():
         Path(input_folder, 'premiere_dates_df.csv'), index_col=1
     ).to_dict('index')
 
+    missing_release_dates = {item[0]: item[1] for item in pd.read_csv(
+        Path(input_folder, 'missing_release_dates.csv'), header=None
+    ).to_dict('records')}
+
     all_nametags = []
     missing_dates = []
 
-    for key, value in nf_dict.items():
-        slug = replacement_dict.get(slugify(key), slugify(key))
+    for title, nfid in nf_dict.items():
+        slug = replacement_dict.get(slugify(title), slugify(title))
         data = {
-            'title': key,
-            'nfid': value,
+            'title': title,
+            'nfid': nfid,
             'slug': slug,
         }
 
         try:
             data['date'] = premiere_dates_by_slug.get(slug, None)['Premiere Date']
         except TypeError:
-            missing_dates.append(key)
-            data['date'] = None
+            try:
+                data['date'] = missing_release_dates.get(title, None)
+            except TypeError:
+                missing_dates.append(title)
+                data['date'] = None
 
         all_nametags.append(data)
 
@@ -47,8 +54,9 @@ def nametag_main():
     print('\nNo Slug provided for following films (based on exclusion policy):')
     [print(item['title']) for item in all_nametags if item['slug'] == 'EXCLUDE']
 
-    print('\nNo Release Date found for following films:')
-    [print(item) for item in missing_dates]
+    if len(missing_dates) > 0:
+        print('\nNo Release Date found for following films:')
+        [print(item) for item in missing_dates]
 
 
 if __name__ == '__main__':

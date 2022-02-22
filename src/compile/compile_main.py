@@ -46,6 +46,7 @@ def compile_main():
     print('\nLoading FlixPatrol Top 10 Data')
 
     flixpatrol_points_dataframe = clean_flixpatrol_data(file_path['flix_top10'])
+    flixpatrol_points_dataframe.to_csv(Path(parts_path, 'flixpatrol_top10_df.csv'))
     final_df = final_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
     final_df = final_df[(final_df['Country'] == final_df['level_1']) | (final_df['level_1'].isna())]
     final_df.to_csv(Path(parts_path, '[p]unogs_gt_and_top10.csv'))
@@ -59,6 +60,7 @@ def compile_main():
     """
     print('\nLoading FlixPatrol Countries Data')
     flixpatrol_countries_dataframe = clean_flix_countries(file_path['flix_country'])
+    flixpatrol_countries_dataframe.to_csv(Path(parts_path, 'flixpatrol_countries_df.csv'))
     final_df = final_df.merge(flixpatrol_countries_dataframe, left_on='slug', right_index=True, how='left')
     final_df.to_csv(Path(parts_path, '[p]unogs_gt_top10_and_countries.csv'))
 
