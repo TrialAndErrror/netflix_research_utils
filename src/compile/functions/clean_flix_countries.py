@@ -1,9 +1,9 @@
-from src.utils import read_file
+from src.utils import read_json
 import pandas as pd
 
 
 def clean_flix_countries(file_path):
-    country_info = read_file(file_path)
+    country_info = read_json(file_path)
     total_countries = []
 
     for item in country_info.values():

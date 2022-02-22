@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from src.utils import read_file
+from src.utils import read_json
 
 ALL_COUNTRIES = [
     'Argentina',
@@ -110,7 +110,7 @@ def prepare_dataframes_to_join(cleaned_movies_history):
 
 
 def clean_flixpatrol_data(history_file):
-    history_data = read_file(history_file)
+    history_data = read_json(history_file)
 
     cleaned_movies_history = {}
 

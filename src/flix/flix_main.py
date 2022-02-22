@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 
-from src.utils import write_file
+from src.utils import write_json
 
 from src.flix import PICKLE_DIR, SUMMARY_DIR
 from src.flix.utils.directories import setup_directories
 from src.flix.utils.slug_utils import slugify_nf_dict
-from src.utils import read_file
+from src.utils import read_json
 
 from src.flix.functions.info import make_info_dfs, flix_info
 from src.flix.functions.history import make_history_dfs, flix_history
@@ -67,7 +67,7 @@ def flixpatrol_main():
     os.makedirs(PICKLE_DIR, exist_ok=True)
     nf_dict_path = Path(os.getcwd(), 'netflix_nametags.json')
     if nf_dict_path.exists():
-        data = read_file(nf_dict_path)
+        data = read_json(nf_dict_path)
         run_all(data)
     else:
         raise FileNotFoundError(

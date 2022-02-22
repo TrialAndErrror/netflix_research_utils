@@ -11,7 +11,7 @@ from src.flix.utils.debug_messages import print_green
 from src.flix.functions.utils import check_for_missing_data
 from src.flix.utils.network import get_data
 from src.flix.utils.pickle_utils import save_pickle, load_pickle
-from src.utils import write_file
+from src.utils import write_json
 
 
 def flix_info(nf_id_dict):
@@ -32,17 +32,25 @@ def flix_info(nf_id_dict):
     for title in nf_id_dict:
         print(f'{count}/{total_count}')
 
-        """
-        Check if data is present by looking for "Missing Data" string in page
-        """
-        missing = get_data(title['slug'], url='', extra_folder='info')
+        if title['slug'] == 'EXCLUDE':
+            """
+            Check if title is excluded.
 
-        if missing:
+            This occurs if the slug on FlixPatrol is not for this title, and there is no FlixPatrol page for this title.
             """
-            If title is missing, add to missing titles list and save each time a title is added.
+            print(f'Skipping {title["title"]} based on exclusion policy.\n')
+        else:
             """
-            missing_titles.append(missing)
-            save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
+            Check if data is present by looking for "Missing Data" string in page
+            """
+            missing = get_data(title['slug'], url='', extra_folder='info')
+
+            if missing:
+                """
+                If title is missing, add to missing titles list and save each time a title is added.
+                """
+                missing_titles.append(missing)
+                save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
 
         count += 1
 
@@ -161,4 +169,4 @@ def save_premiere_dates_df(premiere_dict, title_replace_dict):
 
 def save_top10_dict(data, filename):
     export_dict = {title: df.to_dict() for title, df in data.items()}
-    write_file(export_dict, Path(os.getcwd(), SUMMARY_DIR, filename))
+    write_json(export_dict, Path(os.getcwd(), SUMMARY_DIR, filename))

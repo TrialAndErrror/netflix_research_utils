@@ -7,7 +7,7 @@ import os
 from pytrends.exceptions import ResponseError
 from pytrends.request import TrendReq
 
-from src.utils import read_file
+from src.utils import read_json
 
 pytrend = TrendReq()
 
@@ -111,12 +111,16 @@ def trends_main():
 
     print('Making Date Range Columns')
 
-    netflix_titles_df = pd.DataFrame(read_file(Path(os.getcwd(), 'netflix_nametags.json')))
+    netflix_nametags_file = Path(os.getcwd(), 'netflix_nametags.json')
+    if not netflix_nametags_file.exists():
+        raise FileNotFoundError('Missing Netflix Nametags file')
+
+    netflix_titles_df = pd.DataFrame(read_json(netflix_nametags_file))
     total_df = create_date_range_column(netflix_titles_df)
 
     print('Fetching Data')
     new_df = process_df_lines(total_df)
-    slug_lookup_dict = {item['title']: item['slug'] for item in read_file(Path('netflix_nametags.json'))}
+    slug_lookup_dict = {item['title']: item['slug'] for item in read_json(Path('netflix_nametags.json'))}
     new_df = new_df.rename_axis('title').reset_index()
     new_df['slug'] = new_df['title'].apply(lambda x: slug_lookup_dict.get(x))
 

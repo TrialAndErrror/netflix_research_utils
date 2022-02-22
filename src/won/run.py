@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 from src.won.xpaths import NEXT_BUTTON, get_row_xpath, EXPAND_BUTTON_CELL, get_title_cell, get_netflix_url_cell, ENTRY_TABLE
 from src.won import get_output_filename, BASE_URL, log_error, log_debug
-from src.utils import write_file
+from src.utils import write_json
 
 END_FLAG = False
 
@@ -180,7 +180,7 @@ def get_site_data():
         """
         Write file once page is done; this way, if it crashes at end, we don't lose data.
         """
-        write_file(movie_info, file_name)
+        write_json(movie_info, file_name)
 
         """
         Check if there are more pages, and click next button.

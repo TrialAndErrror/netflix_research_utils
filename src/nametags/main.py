@@ -1,6 +1,6 @@
 import os
 
-from src.utils import read_file, write_file
+from src.utils import read_json, write_json
 from slugify import slugify
 from pathlib import Path
 import pandas as pd
@@ -13,7 +13,7 @@ def nametag_main():
     input_folder = Path(os.getcwd(), 'inputs')
     input_folder.mkdir(exist_ok=True)
 
-    nf_dict = read_file(Path(input_folder, 'nf_dict.json'))
+    nf_dict = read_json(Path(input_folder, 'nf_dict.json'))
     title_list = list(pd.read_csv(Path(input_folder, 'final_list_of_titles.csv'))['unique.unogs4.title.'].unique())
     nf_dict = {key: value for key, value in nf_dict.items() if key in title_list}
 
@@ -26,26 +26,33 @@ def nametag_main():
     ).to_dict('index')
 
     all_nametags = []
+    missing_dates = []
 
     for key, value in nf_dict.items():
         slug = replacement_dict.get(slugify(key), slugify(key))
-
         data = {
             'title': key,
             'nfid': value,
             'slug': slug,
         }
 
+
         try:
             data['date'] = premiere_dates_by_slug.get(slug, None)['Premiere Date']
         except TypeError:
-            print(f'No premiere date found for {key}')
+            missing_dates.append(key)
             data['date'] = None
 
         all_nametags.append(data)
 
     print(f'Found {len(all_nametags)}')
-    write_file(all_nametags, Path(output_folder, 'netflix_nametags.json'))
+    write_json(all_nametags, Path(output_folder, 'netflix_nametags.json'))
+
+    print('\nNo Slug provided for following films (based on exclusion policy):')
+    [print(item['title']) for item in all_nametags if item['slug'] == 'EXCLUDE']
+
+    print('\nNo Release Date found for following films:')
+    [print(item) for item in missing_dates]
 
 
 if __name__ == '__main__':

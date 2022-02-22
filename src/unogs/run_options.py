@@ -2,8 +2,7 @@ from selenium import webdriver
 
 from src.unogs.region_blocks import check_all_region_blocks, process_region_blocks
 from src.unogs import DEBUG, MAX_COUNT
-from src.unogs.file_commands import load_pickle, save_pickle
-from slugify import slugify
+from src.utils import save_pickle, load_pickle
 
 
 def process_movie_entry(driver: webdriver, nfid: str, slug: str, title: str):
@@ -104,7 +103,7 @@ def run_with_limit(netflix_nametags: list):
         Set MAX COUNT to an integer to set the maximum number of movies to process.
         """
         count += 1
-        if count >= MAX_COUNT and DEBUG:
+        if count >= MAX_COUNT:
             break
 
     """
@@ -112,8 +111,6 @@ def run_with_limit(netflix_nametags: list):
     """
     driver.close()
     driver.quit()
-
-    return movie_data
 
 
 def run_all_movies(netflix_nametags: list):
@@ -166,5 +163,3 @@ def run_all_movies(netflix_nametags: list):
     """
     driver.close()
     driver.quit()
-
-    return movie_data

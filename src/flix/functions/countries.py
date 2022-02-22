@@ -11,18 +11,26 @@ from src.flix.utils.debug_messages import print_red, print_green
 from src.flix.utils.pickle_utils import save_pickle, load_pickle
 from src.flix.utils.network import get_data
 
-from src.utils import write_file
+from src.utils import write_json
 
 
 def flix_countries(nf_id_dict):
     missing_titles = []
 
     for title in nf_id_dict:
-        missing = get_data(title['slug'], url='streaming/', extra_folder='country')
+        if title['slug'] == 'EXCLUDE':
+            """
+            Check if title is excluded.
 
-        if missing:
-            missing_titles.append(missing)
-            save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
+            This occurs if the slug on FlixPatrol is not for this title, and there is no FlixPatrol page for this title.
+            """
+            print(f'Skipping {title["title"]} based on exclusion policy.\n')
+        else:
+            missing = get_data(title['slug'], url='streaming/', extra_folder='country')
+
+            if missing:
+                missing_titles.append(missing)
+                save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
 
 
 def get_countries_list(soup) -> Optional[List]:
@@ -102,4 +110,4 @@ def make_country_dfs(slug_replace_dict):
 
         counter += 1
 
-    write_file(country_dict, Path(SUMMARY_DIR, 'country_results.json'))
+    write_json(country_dict, Path(SUMMARY_DIR, 'country_results.json'))

@@ -11,18 +11,26 @@ from src.flix.functions.utils import check_for_missing_data
 from src.flix.utils.network import get_data
 from src.flix.utils.pickle_utils import save_pickle, load_pickle
 
-from src.utils import write_file
+from src.utils import write_json
 
 
 def flix_history(nf_id_dict):
     missing_titles = []
 
     for title in nf_id_dict:
-        missing = get_data(title['slug'], url='top10/', extra_folder='history')
+        if title['slug'] == 'EXCLUDE':
+            """
+            Check if title is excluded.
 
-        if missing:
-            missing_titles.append(missing)
-            save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
+            This occurs if the slug on FlixPatrol is not for this title, and there is no FlixPatrol page for this title.
+            """
+            print(f'Skipping {title["title"]} based on exclusion policy.\n')
+        else:
+            missing = get_data(title['slug'], url='top10/', extra_folder='history')
+
+            if missing:
+                missing_titles.append(missing)
+                save_pickle(missing_titles, '!!!missing_titles!!!', extra_folder='summary')
 
 
 def get_history_tables(soup: BeautifulSoup) -> pd.DataFrame:
@@ -116,4 +124,4 @@ def make_history_dfs(slug_replace_dict):
     # title_replace_dict = {v: k for k, v in slug_replace_dict.items()}
     #
     history_json = {title: df.to_dict() for title, df in history_dict.items()}
-    write_file(history_json, Path(SUMMARY_DIR, 'history_results.json'))
+    write_json(history_json, Path(SUMMARY_DIR, 'history_results.json'))

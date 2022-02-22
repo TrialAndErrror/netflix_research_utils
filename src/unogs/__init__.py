@@ -49,7 +49,6 @@ home_dir = Path(os.getcwd())
 
 INPUT_FOLDER = Path(home_dir, 'inputs')
 OUTPUT_FOLDER = Path(home_dir, 'results')
-PROCESSED_FOLDER = Path(home_dir, 'processed')
 PICKLE_FOLDER = Path(home_dir, 'pickles')
 
 """
