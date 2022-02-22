@@ -15,6 +15,9 @@ def check_for_required_files():
     parts_dir_name = 'parts'
     parts_path = Path(os.getcwd(), parts_dir_name)
 
+    input_path.mkdir(exist_ok=True)
+    parts_path.mkdir(exist_ok=True)
+
     file_path = {
         'unogs': Path(input_path, 'final_unogs_df.csv'),
         'trends': Path(input_path, 'google_trends_data.csv'),
@@ -22,9 +25,6 @@ def check_for_required_files():
         'flix_top10': Path(input_path, 'history_results.json'),
         'flix_country': Path(input_path, 'country_results.json'),
     }
-
-    input_path.mkdir(exist_ok=True)
-    parts_path.mkdir(exist_ok=True)
 
     for file in file_path.values():
         if not file.exists():
@@ -52,8 +52,7 @@ def clean_col_names(final_df, grouped_df):
     return final_df, grouped_df
 
 
-def merge_with_gt(df, gt_data, filename):
-    df_path = Path(PARTS_PATH, filename)
+def merge_with_gt(df, gt_data, df_path):
 
     if not df_path.exists():
         result = merge_unogs_and_gt(df, gt_data)
@@ -64,21 +63,21 @@ def merge_with_gt(df, gt_data, filename):
     return result
 
 
-def merge_grouped_and_google_trends(grouped_df, gt_data):
-    return merge_with_gt(grouped_df, gt_data, '[p]grp_unogs_and_gt.csv')
+def merge_grouped_and_google_trends(grouped_df, gt_data, parts_path):
+    return merge_with_gt(grouped_df, gt_data, Path(parts_path, '[p]grp_unogs_and_gt.csv'))
 
 
-def merge_unogs_and_google_trends(unogs_df, gt_data):
-    return merge_with_gt(unogs_df, gt_data, '[p]unogs_and_gt.csv')
+def merge_unogs_and_google_trends(unogs_df, gt_data, parts_path):
+    return merge_with_gt(unogs_df, gt_data, Path(parts_path, '[p]unogs_and_gt.csv'))
 
 
-def load_or_create_unogs_df(nf_originals):
+def load_or_create_unogs_df(nf_originals, file_path, parts_path):
     nf_slugs = [item['slug'] for item in nf_originals]
 
     print('\nLoading UNOGS Data')
-    unogs_df_path = Path(PARTS_PATH, '[p]unogs_df.csv')
+    unogs_df_path = Path(parts_path, '[p]unogs_df.csv')
     if not unogs_df_path.exists():
-        unogs_df = pd.read_csv(FILE_PATH['unogs'])
+        unogs_df = pd.read_csv(file_path['unogs'])
         unogs_df = unogs_df[unogs_df['slug'].isin(nf_slugs)]
         unogs_df = clean_unogs(unogs_df)
         unogs_df.to_csv(unogs_df_path)
@@ -86,7 +85,7 @@ def load_or_create_unogs_df(nf_originals):
         unogs_df = pd.read_csv(unogs_df_path)
 
     print('\nGrouping UNOGS Data')
-    grouped_df_path = Path(PARTS_PATH, '[p]grp_unogs_df.csv')
+    grouped_df_path = Path(parts_path, '[p]grp_unogs_df.csv')
     if not grouped_df_path.exists():
         grouped_df = perform_make_exclusive(unogs_df)
         grouped_df.to_csv(grouped_df_path)
@@ -94,17 +93,3 @@ def load_or_create_unogs_df(nf_originals):
         grouped_df = pd.read_csv(grouped_df_path)
 
     return unogs_df, grouped_df
-
-# def load_or_create_grouped_df(nf_originals, unogs_df):
-#     print('\nGrouping UNOGS Data')
-#     grouped_df_path = Path(PARTS_PATH, '[p]grp_unogs_df.csv')
-#     nf_slugs = [item['slug'] for item in nf_originals]
-#     if not grouped_df_path.exists():
-#         grouped_df = clean_unogs(unogs_df)
-#         grouped_nf_df = grouped_df[grouped_df['slug'].isin(nf_slugs)]
-#         grouped_df = perform_make_exclusive(grouped_nf_df)
-#         grouped_df.to_csv(grouped_df_path)
-#     else:
-#         grouped_df = pd.read_csv(grouped_df_path)
-#
-#     return grouped_df

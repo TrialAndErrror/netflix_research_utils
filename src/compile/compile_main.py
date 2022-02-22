@@ -26,9 +26,7 @@ def compile_main():
     Load UNOGS dataframe and Google Trends Dataframe
     """
     nf_nametags = read_json(file_path['nf_dict'])
-    unogs_df, grouped_df = load_or_create_unogs_df(nf_nametags)
-
-    # grouped_df = load_or_create_grouped_df(nf_nametags, unogs_df)
+    unogs_df, grouped_df = load_or_create_unogs_df(nf_nametags, file_path, parts_path)
 
     """
     Load Google Trends Dataframe
@@ -39,9 +37,8 @@ def compile_main():
     """
     Merge UNOGS and Google Trends data
     """
-    final_df = merge_unogs_and_google_trends(unogs_df, gt_data)
-
-    grouped_df = merge_grouped_and_google_trends(grouped_df, gt_data)
+    final_df = merge_unogs_and_google_trends(unogs_df, gt_data, parts_path)
+    grouped_df = merge_grouped_and_google_trends(grouped_df, gt_data, parts_path)
 
     """
     Load and Merge FlixPatrol Top 10 Overall Data

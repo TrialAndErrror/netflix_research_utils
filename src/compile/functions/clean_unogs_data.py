@@ -133,15 +133,11 @@ def replace_columns(df):
     }
 
     def consolidate_column(row, replace_dict):
-        # error_list = []
         for key, value in replace_dict.items():
             try:
                 row[value] = bool(row[key] or row[value])
-            except KeyError as e:
-                # error_list.append(str(e))
+            except KeyError:
                 pass
-        # error_list = list(set(error_list))
-        # print(f'Columns not found in dataset: {error_list}')
 
     def consolidate_all_columns(df):
         df.apply(lambda x: consolidate_column(x, replace_dict), axis=1)

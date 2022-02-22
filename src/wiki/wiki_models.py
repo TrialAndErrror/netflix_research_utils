@@ -3,7 +3,7 @@ import pandas as pd
 
 
 WIKI_URLS = {
-    'Films':{
+    'Films': {
         '2015-2017': 'https://en.wikipedia.org/wiki/List_of_Netflix_original_films_(2015%E2%80%932017)',
         '2018': 'https://en.wikipedia.org/wiki/List_of_Netflix_original_films_(2018)',
         '2019': 'https://en.wikipedia.org/wiki/List_of_Netflix_original_films_(2019)',
@@ -33,15 +33,25 @@ class WikiAnalyzer:
         self.all_wiki_titles = []
         self.all_dataset_titles = []
 
-    def help(self):
+    @staticmethod
+    def help():
         info = {
-            '.run_all()': 'Fetch data from Wikipedia and compare with the netflix dict. Outputs the number of titles found and missing titles.\n',
+            '.run_all()': 'Fetch data from Wikipedia and compare with the netflix dict. Outputs the number of titles '
+                          'found and missing titles.\n',
+
             '.dataset_split_dict': 'Get dictionary of netflix dict tiles split up by Wikipedia page\n',
+
             '.all_wiki_titles': 'List of titles found across all Wiki pages',
+
             '.all_dataset_titles': 'List of all titles from netflix dict that were found on Wiki pages',
+
             '.leftovers': 'List of titles that were not found on Wiki pages.\n',
-            '.count_number_identified()': 'Get count of number of titles from the nf_dict that were identified across all Wiki pages.',
-            '.count_number_of_leftovers()': 'Get count of number of titles that were not identified across all Wiki pates.',
+
+            '.count_number_identified()': 'Get count of number of titles from the nf_dict that were identified across '
+                                          'all Wiki pages.',
+
+            '.count_number_of_leftovers()': 'Get count of number of titles that were not identified across all '
+                                            'Wiki pates.',
         }
 
         for command, description in info.items():

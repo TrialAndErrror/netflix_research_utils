@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import os
 from datetime import datetime
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 init()
 
 WON_DEBUG = False
@@ -30,6 +30,7 @@ def get_output_filename():
 
 def get_generic_filename():
     return Path(OUTPUT_FILE_DIR, 'nf_dict.json')
+
 
 """
 Logging Setup, for errors and troubleshooting

@@ -95,7 +95,7 @@ seaborn==0.11.2
 selenium==4.1.0
 Send2Trash==1.8.0
 six==1.16.0
-slugify
+slugify~=0.0.1
 sniffio==1.2.0
 sortedcontainers==2.4.0
 soupsieve==2.3.1
@@ -122,3 +122,5 @@ webencodings==0.5.1
 widgetsnbextension==3.5.2
 wsproto==1.0.0
 yarl==1.7.2
+
+pytrends~=4.8.0

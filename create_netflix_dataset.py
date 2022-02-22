@@ -110,7 +110,7 @@ def chetflix_main():
     1. Chdir to src/compile
     2. Run compile_main()
     """
-    os.chdir(compile_folder)
+    os.chdir(Path(src_dir, 'compile'))
     grouped_df_path = compile_main()
 
     print(f'Saved compiled dataset to {grouped_df_path}')

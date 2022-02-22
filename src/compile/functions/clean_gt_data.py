@@ -1,5 +1,4 @@
 import pandas as pd
-from slugify import slugify
 
 
 def get_gt_column(row):

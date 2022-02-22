@@ -44,13 +44,13 @@ ALL_COUNTRIES = [
     'United States']
 
 
-def replace_indices_with_country(dict):
+def replace_indices_with_country(flix_dict):
     results = {}
 
     # These are the values that we don't want to end up in our final chart
     value_exclude_list = 'Country', 'Unnamed: 2', 'Weeks.1', 'Points.1'
 
-    for movie_title, data_dict in dict.items():
+    for movie_title, data_dict in flix_dict.items():
         results[movie_title] = {}
 
         # Make sure there's data, and then get the list of countries
@@ -69,10 +69,10 @@ def replace_indices_with_country(dict):
     return results
 
 
-def reform_dict(dict):
+def reform_dict(target_dict):
     results = {}
 
-    for outerkey, innerdict in dict.items():
+    for outerkey, innerdict in target_dict.items():
         if innerdict:
             for innerkey, values in innerdict.items():
                 results[(outerkey, innerkey)] = values
@@ -80,8 +80,8 @@ def reform_dict(dict):
     return results
 
 
-def make_into_dataframe(dict):
-    df = pd.DataFrame.from_dict(dict, orient="index").stack().to_frame()
+def make_into_dataframe(target_dict):
+    df = pd.DataFrame.from_dict(target_dict, orient="index").stack().to_frame()
     return pd.DataFrame(df[0].values.tolist(), index=df.index)
 
 

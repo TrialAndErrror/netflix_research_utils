@@ -14,6 +14,8 @@ def process_movie_entry(driver: webdriver, nfid: str, slug: str, title: str):
     :param driver: Webdriver
     :param nfid: str
     :param slug: str
+    :param title: str
+
     :return: None
     """
 

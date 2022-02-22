@@ -33,7 +33,6 @@ def nametag_main():
             'slug': slug,
         }
 
-
         try:
             data['date'] = premiere_dates_by_slug.get(slug, None)['Premiere Date']
         except TypeError:

@@ -6,7 +6,8 @@ from selenium import webdriver
 from selenium.common.exceptions import ElementNotInteractableException, NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from src.won.xpaths import NEXT_BUTTON, get_row_xpath, EXPAND_BUTTON_CELL, get_title_cell, get_netflix_url_cell, ENTRY_TABLE
+from src.won.xpaths import NEXT_BUTTON, get_row_xpath, EXPAND_BUTTON_CELL, get_title_cell, get_netflix_url_cell, \
+    ENTRY_TABLE
 from src.won import get_output_filename, BASE_URL, log_error, log_debug, get_generic_filename
 from src.utils import write_json, read_json
 
@@ -42,7 +43,7 @@ def expand_all_rows(driver, rows):
     row.
 
     :param driver: webdriver
-
+    :param rows: int
     """
 
     """
@@ -76,6 +77,8 @@ def get_all_movies(driver: webdriver, movie_info: dict, rows: int):
     Iterate over table rows and gather the Title and Netflix ID from each row.
 
     :param driver: webdriver
+    :param movie_info: dict
+    :param rows: int
     """
     for row_num in range(1, rows * 2, 2):
         print(f'Found Row {row_num}: ', end='')
