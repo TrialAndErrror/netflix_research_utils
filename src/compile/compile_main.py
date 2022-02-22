@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.compile.functions.utils import PARTS_PATH, check_for_required_files, create_output_folder, \
+from src.compile.functions.utils import check_for_required_files, create_output_folder, \
     clean_col_names, merge_grouped_and_google_trends, merge_unogs_and_google_trends, load_or_create_unogs_df
 from src.utils import read_json
 from src.compile.functions.clean_gt_data import clean_gt
@@ -20,7 +20,7 @@ def compile_main():
     """
     Setup directories and make sure all required files are present
     """
-    file_path = check_for_required_files()
+    file_path, input_path, parts_path = check_for_required_files()
 
     """
     Load UNOGS dataframe and Google Trends Dataframe
@@ -51,11 +51,11 @@ def compile_main():
     flixpatrol_points_dataframe = clean_flixpatrol_data(file_path['flix_top10'])
     final_df = final_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
     final_df = final_df[(final_df['Country'] == final_df['level_1']) | (final_df['level_1'].isna())]
-    final_df.to_csv(Path(PARTS_PATH, '[p]unogs_gt_and_top10.csv'))
+    final_df.to_csv(Path(parts_path, '[p]unogs_gt_and_top10.csv'))
 
     grouped_df = grouped_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
     grouped_df = grouped_df[(grouped_df['Country'] == grouped_df['level_1']) | (grouped_df['level_1'].isna())]
-    grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_and_top10.csv'))
+    grouped_df.to_csv(Path(parts_path, '[p]grp_unogs_gt_and_top10.csv'))
 
     """
     Load and Merge FlixPatrol Countries Data
@@ -63,10 +63,10 @@ def compile_main():
     print('\nLoading FlixPatrol Countries Data')
     flixpatrol_countries_dataframe = clean_flix_countries(file_path['flix_country'])
     final_df = final_df.merge(flixpatrol_countries_dataframe, left_on='slug', right_index=True, how='left')
-    final_df.to_csv(Path(PARTS_PATH, '[p]unogs_gt_top10_and_countries.csv'))
+    final_df.to_csv(Path(parts_path, '[p]unogs_gt_top10_and_countries.csv'))
 
     grouped_df = grouped_df.merge(flixpatrol_countries_dataframe, left_on='slug', right_index=True, how='left')
-    grouped_df.to_csv(Path(PARTS_PATH, '[p]grp_unogs_gt_top10_and_countries.csv'))
+    grouped_df.to_csv(Path(parts_path, '[p]grp_unogs_gt_top10_and_countries.csv'))
 
     """
     Be sure to remove any unnecessary columns before saving.

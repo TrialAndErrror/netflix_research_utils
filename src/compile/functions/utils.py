@@ -8,30 +8,30 @@ from src.compile.functions.clean_gt_data import merge_unogs_and_gt
 from src.compile.functions.clean_unogs_data import clean_unogs
 from src.compile.functions.make_groups import perform_make_exclusive
 
-INPUT_DIR_NAME = 'inputs'
-INPUT_PATH = Path(os.getcwd(), INPUT_DIR_NAME)
-PARTS_DIR_NAME = 'parts'
-PARTS_PATH = Path(os.getcwd(), PARTS_DIR_NAME)
-
-
 
 def check_for_required_files():
+    input_dir_name = 'inputs'
+    input_path = Path(os.getcwd(), input_dir_name)
+    parts_dir_name = 'parts'
+    parts_path = Path(os.getcwd(), parts_dir_name)
+
     file_path = {
-        'unogs': Path(INPUT_PATH, 'final_unogs_df.csv'),
-        'trends': Path(INPUT_PATH, 'google_trends_data.csv'),
-        'nf_dict': Path(INPUT_PATH, 'netflix_nametags.json'),
-        'flix_top10': Path(INPUT_PATH, 'history_results.json'),
-        'flix_country': Path(INPUT_PATH, 'country_results.json'),
+        'unogs': Path(input_path, 'final_unogs_df.csv'),
+        'trends': Path(input_path, 'google_trends_data.csv'),
+        'nf_dict': Path(input_path, 'netflix_nametags.json'),
+        'flix_top10': Path(input_path, 'history_results.json'),
+        'flix_country': Path(input_path, 'country_results.json'),
     }
 
-    INPUT_PATH.mkdir(exist_ok=True)
-    PARTS_PATH.mkdir(exist_ok=True)
+    input_path.mkdir(exist_ok=True)
+    parts_path.mkdir(exist_ok=True)
 
     for file in file_path.values():
         if not file.exists():
             raise FileNotFoundError(f'Missing Required Input File: {file}')
 
-    return file_path
+    return file_path, input_path, parts_path
+
 
 def create_output_folder():
     output_folder = Path(os.getcwd(), 'output', f'Compile Results: {datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}')
