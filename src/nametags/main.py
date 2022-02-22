@@ -1,17 +1,14 @@
-import os
-
-from src.utils import read_json, write_json
 from slugify import slugify
 from pathlib import Path
 import pandas as pd
 
+from src.utils import read_json, write_json
+from src.nametags import get_input_folder, get_output_folder
+
 
 def nametag_main():
-    output_folder = Path(os.getcwd(), 'output')
-    output_folder.mkdir(exist_ok=True)
-
-    input_folder = Path(os.getcwd(), 'inputs')
-    input_folder.mkdir(exist_ok=True)
+    output_folder = get_output_folder()
+    input_folder = get_input_folder()
 
     nf_dict = read_json(Path(input_folder, 'nf_dict.json'))
     title_list = list(pd.read_csv(Path(input_folder, 'final_list_of_titles.csv'))['unique.unogs4.title.'].unique())

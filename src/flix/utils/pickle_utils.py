@@ -2,15 +2,15 @@ import os
 import pickle
 from pathlib import Path
 
-from src.flix import PICKLE_DIR
+from src.flix import get_pickle_dir
 
 
 def get_pickle_path(filename, extra_folder: str = None):
     filename = filename if filename.endswith('.pickle') else f'{filename}.pickle'
     if extra_folder:
-        path = Path(PICKLE_DIR, extra_folder, f'{filename}')
+        path = Path(get_pickle_dir(), extra_folder, f'{filename}')
     else:
-        path = Path(PICKLE_DIR, f'{filename}')
+        path = Path(get_pickle_dir(), f'{filename}')
     os.makedirs(path.parent, exist_ok=True)
     return path
 

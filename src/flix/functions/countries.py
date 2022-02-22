@@ -1,12 +1,10 @@
-import glob
-import os
 from pathlib import Path
 from typing import Optional, List, Text
 
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.flix import PICKLE_DIR, SUMMARY_DIR
+from src.flix import get_summary_dir, get_pickle_dir
 from src.flix.utils.debug_messages import print_red, print_green
 from src.flix.utils.pickle_utils import save_pickle, load_pickle
 from src.flix.utils.network import get_data
@@ -50,7 +48,7 @@ def get_countries_list(soup) -> Optional[List]:
         return my_list
 
 
-def read_country_soup(filename) -> (Text, List):
+def read_country_soup(filename: Path) -> (Text, List):
     """
     Load pickle file, convert data to soup object, and get countries from the Netflix Countries table.
 
@@ -61,9 +59,10 @@ def read_country_soup(filename) -> (Text, List):
     """
     Load pickle and initialize soup object.
     """
-    pickle_path = Path(PICKLE_DIR, 'language', filename)
-    title = filename.split('.')[0].split('/')[-1]
-    obj: str = load_pickle(pickle_path)
+    # pickle_path = Path(os.getcwd(), 'pickle_jar', 'language', filename)
+    # title = filename.split('.')[0].split('/')[-1]
+    title = filename.stem
+    obj: str = load_pickle(filename)
     soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
 
     """
@@ -79,7 +78,7 @@ def read_country_soup(filename) -> (Text, List):
     return title, results
 
 
-def make_country_dfs(slug_replace_dict):
+def make_country_dfs():
     """
     Make Dataframes from all Country Pickles.
 
@@ -93,7 +92,7 @@ def make_country_dfs(slug_replace_dict):
     """
     print('Working on Languages')
     country_dict = {}
-    country_files = glob.glob(f'{PICKLE_DIR}/language/*.pickle')
+    country_files = list(Path(get_pickle_dir(), "language").glob("*.pickle"))
     files_count = len(country_files)
     counter = 1
 
@@ -101,13 +100,12 @@ def make_country_dfs(slug_replace_dict):
     Loop over country files and make dict of results.
     """
     for file in country_files:
-        if not file.split('/')[-1].startswith('!!!'):
-            print(f'Working on {counter}/{files_count}')
-            title, results = read_country_soup(file)
-            if isinstance(results, list):
-                print_green(f'Found Country data for {title}')
-                country_dict[title] = results
+        print(f'Working on {counter}/{files_count}')
+        title, results = read_country_soup(file)
+        if isinstance(results, list):
+            print_green(f'Found Country data for {title}')
+            country_dict[title] = results
 
         counter += 1
 
-    write_json(country_dict, Path(SUMMARY_DIR, 'country_results.json'))
+    write_json(country_dict, Path(get_summary_dir(), 'country_results.json'))

@@ -3,8 +3,6 @@ Initial Configuration for UNOGS
 """
 
 import datetime
-from pathlib import Path
-import os
 import logging
 """
 Testing Variables:
@@ -37,19 +35,6 @@ def make_results_filename():
 def make_processed_filename():
     return f'movies_by_country_and_language_{add_timestamp()}.json'
 
-
-"""
-Directory Setup:
-
-Defines the directories for input and output data.
-
-
-"""
-home_dir = Path(os.getcwd())
-
-INPUT_FOLDER = Path(home_dir, 'inputs')
-OUTPUT_FOLDER = Path(home_dir, 'results')
-PICKLE_FOLDER = Path(home_dir, 'pickles')
 
 """
 Logging Setup:

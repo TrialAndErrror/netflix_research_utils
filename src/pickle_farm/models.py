@@ -1,7 +1,6 @@
 from pathlib import Path
 import pickle
 import json
-from slugify import slugify
 
 from typing import List
 
@@ -239,8 +238,7 @@ def get_original_language(dub_dict):
     Returns None if no original language is found.
 
     :param dub_dict: dict
-
-:   :return: str or None
+    :return: str or None
     """
     for country, lang_list in dub_dict.items():
         for entry in lang_list:

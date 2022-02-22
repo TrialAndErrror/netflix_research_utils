@@ -1,11 +1,10 @@
-import glob
 from pathlib import Path
 from typing import List, Tuple, Text
 
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.flix import PICKLE_DIR, SUMMARY_DIR
+from src.flix import get_summary_dir, get_pickle_dir
 from src.flix.utils.debug_messages import print_red, print_green
 from src.flix.functions.utils import check_for_missing_data
 from src.flix.utils.network import get_data
@@ -62,9 +61,8 @@ def read_history_soup(filename) -> (Text, List[Tuple[str, pd.DataFrame]]):
     """
     Load pickle and initialize soup object.
     """
-    pickle_path = Path(PICKLE_DIR, 'history', filename)
-    title = filename.split('.')[0].split('/')[-1]
-    obj: str = load_pickle(pickle_path)
+    title = filename.stem
+    obj: str = load_pickle(filename)
     soup: BeautifulSoup = BeautifulSoup(obj, features='lxml')
 
     """
@@ -82,7 +80,7 @@ def read_history_soup(filename) -> (Text, List[Tuple[str, pd.DataFrame]]):
     return title, results
 
 
-def make_history_dfs(slug_replace_dict):
+def make_history_dfs():
     """
     Make Dataframes from all History Pickles.
 
@@ -96,7 +94,7 @@ def make_history_dfs(slug_replace_dict):
     """
     print('Working on History')
     history_dict = {}
-    history_files = glob.glob(f'{PICKLE_DIR}/history/*.pickle')
+    history_files = list(Path(get_pickle_dir(), 'history').glob("*.pickle"))
     files_count = len(history_files)
     counter = 1
 
@@ -104,12 +102,11 @@ def make_history_dfs(slug_replace_dict):
     Loop over history pickles and get Top 10 table data.
     """
     for file in history_files:
-        if not file.split('/')[-1].startswith('!!!'):
-            print(f'Working on {counter}/{files_count}')
-            title, results = read_history_soup(file)
-            if isinstance(results, pd.DataFrame):
-                print_green(f'Found History data for {title}')
-                history_dict[title] = results
+        print(f'Working on {counter}/{files_count}')
+        title, results = read_history_soup(file)
+        if isinstance(results, pd.DataFrame):
+            print_green(f'Found History data for {title}')
+            history_dict[title] = results
 
         counter += 1
 
@@ -124,4 +121,4 @@ def make_history_dfs(slug_replace_dict):
     # title_replace_dict = {v: k for k, v in slug_replace_dict.items()}
     #
     history_json = {title: df.to_dict() for title, df in history_dict.items()}
-    write_json(history_json, Path(SUMMARY_DIR, 'history_results.json'))
+    write_json(history_json, Path(get_summary_dir(), 'history_results.json'))

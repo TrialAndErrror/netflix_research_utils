@@ -10,7 +10,6 @@ def get_gt_column(row):
 
 def merge_unogs_and_gt(unogs_df, gt_data):
     test = unogs_df.copy()
-    # test['slug'] = test['title'].apply(lambda x: slugify(x))
     sample = test.merge(gt_data, left_on='slug', right_on='slug', how='left')
     sample['google_trends_score'] = sample.apply(lambda x: get_gt_column(x), axis=1)
     remaining_columns = [
@@ -20,13 +19,10 @@ def merge_unogs_and_gt(unogs_df, gt_data):
         'google_trends_score'
     ]
     remaining_columns.extend(
-        [item for item in sample.columns
-         if (
-                 item.startswith('sub_')
-                 or item.startswith('dub_')
-                 or item.startswith('grp_')
-         )
-         ]
+        [
+            item for item in sample.columns
+            if (item.startswith('sub_') or item.startswith('dub_') or item.startswith('grp_'))
+        ]
     )
     remaining_columns.append('slug')
     sample = sample[remaining_columns]

@@ -6,11 +6,9 @@ import pandas as pd
 
 from src.utils import read_json
 
-PICKLE_FOLDER = Path(os.getcwd(), 'pickles')
-
 
 def get_file_path(key, timeframe):
-    return Path(PICKLE_FOLDER, f'{key}: {timeframe}.pickle')
+    return Path(Path(os.getcwd(), 'pickles'), f'{key}: {timeframe}.pickle')
 
 
 def read_pytrends_data(file_path):
@@ -30,6 +28,7 @@ def load_netflix_nametags():
 
 def setup_directories():
     output_dir = Path(os.getcwd(), 'results')
+    pickle_dir = Path(os.getcwd(), 'pickles')
     output_dir.mkdir(exist_ok=True)
-    PICKLE_FOLDER.mkdir(exist_ok=True)
-    return output_dir
+    pickle_dir.mkdir(exist_ok=True)
+    return pickle_dir, output_dir

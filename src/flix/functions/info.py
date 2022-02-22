@@ -1,4 +1,3 @@
-import glob
 import os
 from pathlib import Path
 from typing import Tuple
@@ -6,7 +5,7 @@ from typing import Tuple
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.flix import PICKLE_DIR, SUMMARY_DIR
+from src.flix import get_summary_dir, get_pickle_dir
 from src.flix.utils.debug_messages import print_green
 from src.flix.functions.utils import check_for_missing_data
 from src.flix.utils.network import get_data
@@ -58,19 +57,17 @@ def flix_info(nf_id_dict):
 def read_info_soup(filename) -> (str, Tuple[str, pd.DataFrame], str):
     """
     Load Pickle Data from Filename;
-    Process for Netflix Info table and Premiere Date
+    Process for Netflix Info table and Premiere Date.
 
     :param filename: str
-
     :return: str, tuple(str, pd.Dataframe), str
     """
-    pickle_path = Path(PICKLE_DIR, 'info', filename)
-    title = filename.split('.')[0].split('/')[-1]
+    title = filename.stem
 
     """
     Load object from Pickle, then load as BeautifulSoup object.
     """
-    obj: str = load_pickle(pickle_path)
+    obj: str = load_pickle(filename)
     soup = BeautifulSoup(obj, features='lxml')
 
     """
@@ -117,7 +114,7 @@ def make_info_dfs(slug_replace_dict):
     """
     Load all Info pickles.
     """
-    info_files = glob.glob(f'{PICKLE_DIR}/info/*.pickle')
+    info_files = list(Path(get_pickle_dir(), 'info').glob("*.pickle"))
     files_count = len(info_files)
 
     """
@@ -125,27 +122,26 @@ def make_info_dfs(slug_replace_dict):
     """
     counter = 1
     for file in info_files:
-        if not file.split('/')[-1].startswith('!!!'):
-            print(f'Working on {counter}/{files_count}')
+        print(f'Working on {counter}/{files_count}')
 
-            title, results, premiere_date = read_info_soup(file)
+        title, results, premiere_date = read_info_soup(file)
 
-            if isinstance(results, pd.DataFrame):
-                print_green(f'Found Info data for {title}')
-                info_dict[title] = results
+        if isinstance(results, pd.DataFrame):
+            print_green(f'Found Info data for {title}')
+            info_dict[title] = results
 
-            if premiere_date:
-                premiere_dict.append({
-                    'title': title,
-                    'Premiere Date': premiere_date
-                })
+        if premiere_date:
+            premiere_dict.append({
+                'title': title,
+                'Premiere Date': premiere_date
+            })
 
         counter += 1
 
     """
     Save results as JSON and Pickle.
     """
-    save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='summary')
+    # save_pickle(info_dict, '!!!info_df_results!!!', extra_folder='summary')
     save_top10_dict(info_dict, 'info_results.json')
 
     """
@@ -164,9 +160,9 @@ def save_premiere_dates_df(premiere_dict, title_replace_dict):
     valid_df = valid_df.rename({'title': 'slug'}, axis=1)
     valid_df['title'] = valid_df['slug'].apply(lambda x: title_replace_dict.get(x, 'Unknown'))
 
-    valid_df.to_csv(Path(SUMMARY_DIR, 'premiere_dates_df.csv'))
+    valid_df.to_csv(Path(get_summary_dir(), 'premiere_dates_df.csv'))
 
 
 def save_top10_dict(data, filename):
     export_dict = {title: df.to_dict() for title, df in data.items()}
-    write_json(export_dict, Path(os.getcwd(), SUMMARY_DIR, filename))
+    write_json(export_dict, Path(os.getcwd(), get_summary_dir(), filename))

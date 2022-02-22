@@ -28,6 +28,9 @@ def get_output_filename():
     return Path(OUTPUT_FILE_DIR, f'nf_originals_dict {datetime.now().strftime("%m-%d-%Y, %H:%M:%S")}')
 
 
+def get_generic_filename():
+    return Path(OUTPUT_FILE_DIR, 'nf_dict.json')
+
 """
 Logging Setup, for errors and troubleshooting
 """

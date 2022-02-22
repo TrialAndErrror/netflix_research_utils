@@ -7,7 +7,7 @@ from src.trends.functions.process import create_date_range_column, process_df_li
 def trends_main():
     print('Starting Google Trends processing...')
 
-    output_dir = setup_directories()
+    pickle_dir, output_dir = setup_directories()
 
     print('Loading Netflix Data')
     netflix_titles_df = load_netflix_nametags()
@@ -22,7 +22,7 @@ def trends_main():
     print(f'Saving Dataframe to {output_file_path}')
     new_df.to_csv(output_file_path)
 
-    return output_dir
+    return output_file_path
 
 
 if __name__ == '__main__':

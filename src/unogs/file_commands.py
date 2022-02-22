@@ -1,13 +1,28 @@
+import os
 from pathlib import Path
 
-from src.unogs import INPUT_FOLDER, OUTPUT_FOLDER, PICKLE_FOLDER
 from src.utils import read_json
 
 
 def setup_directories():
-    INPUT_FOLDER.mkdir(exist_ok=True)
-    OUTPUT_FOLDER.mkdir(exist_ok=True)
-    PICKLE_FOLDER.mkdir(exist_ok=True)
+    """
+    Directory Setup:
+
+    Defines the directories for input and output data.
+
+
+    """
+    home_dir = Path(os.getcwd())
+
+    input_folder = Path(home_dir, 'inputs')
+    output_folder = Path(home_dir, 'results')
+    pickle_folder = Path(home_dir, 'pickles')
+
+    input_folder.mkdir(exist_ok=True)
+    output_folder.mkdir(exist_ok=True)
+    pickle_folder.mkdir(exist_ok=True)
+
+    return pickle_folder
 
 
 def load_netflix_nametags():
@@ -17,7 +32,7 @@ def load_netflix_nametags():
     :param filename: str
     :return: dict
     """
-    nf_path = Path(INPUT_FOLDER, 'netflix_nametags.json')
+    nf_path = Path(os.getcwd(), 'inputs', 'netflix_nametags.json')
 
     """
     If nf_dict doesn't exist, raise an error

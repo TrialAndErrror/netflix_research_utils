@@ -4,10 +4,9 @@ import pandas as pd
 from pathlib import Path
 from src.pickle_farm.models import PickleReader
 from datetime import datetime
-from src.pickle_farm import LANGUAGE_COLUMNS, PICKLES_DIR, LANG_REPLACEMENTS, ENABLE_REPLACEMENTS
 
 
-def run_all_pickles(pickle_dir: Path or str = PICKLES_DIR):
+def run_all_pickles(pickle_dir: Path or str):
     """
     Process all pickles and save as dataframes.
 
@@ -134,13 +133,6 @@ def process_pickles_into_df(all_pickles, language_list):
         """
         
         if obj.title:
-            """
-            If replacements are enabled, make them now before making dataframe entries.
-            """
-            if ENABLE_REPLACEMENTS:
-                for key, value in LANG_REPLACEMENTS.items():
-                    obj.replace_language(key, value)
-
             all_entries.extend(obj.make_dataframe_entries(language_list))
         else:
             error_list.append(str(pickle).split('/')[-1].split('.')[-2])
@@ -151,20 +143,3 @@ def process_pickles_into_df(all_pickles, language_list):
     df = pd.DataFrame.from_records(all_entries)
 
     return df, error_list
-
-
-def test_pickle(pickle_dir: str = PICKLES_DIR) -> PickleReader:
-    """
-    Test function to verify PickleReader functionality
-
-    :return: PickleReader
-    """
-    pickle_folder = Path(pickle_dir)
-    test_name = 'bruised.pickle'
-
-    return PickleReader(Path(pickle_folder, test_name))
-
-
-if __name__ == '__main__':
-    run_all_pickles()
-

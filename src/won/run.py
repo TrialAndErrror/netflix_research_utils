@@ -1,12 +1,14 @@
+import os
 import time
+from pathlib import Path
 
 from selenium import webdriver
 from selenium.common.exceptions import ElementNotInteractableException, NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from src.won.xpaths import NEXT_BUTTON, get_row_xpath, EXPAND_BUTTON_CELL, get_title_cell, get_netflix_url_cell, ENTRY_TABLE
-from src.won import get_output_filename, BASE_URL, log_error, log_debug
-from src.utils import write_json
+from src.won import get_output_filename, BASE_URL, log_error, log_debug, get_generic_filename
+from src.utils import write_json, read_json
 
 END_FLAG = False
 
@@ -190,16 +192,22 @@ def get_site_data():
     """
     Once done with the loop, write results to a file.
     """
+
+    """
+    Exclude any names from excluded_films json.
+    """
+    excluded_names = read_json(Path(os.getcwd(), 'excluded_films.json'))
+    for name in excluded_names:
+        movie_info.pop(name, None)
+
+    write_json(movie_info, get_generic_filename())
     print('Finished Collecting Netflix IDs')
-    # write_file(movie_info, file_name)
 
     """
     Close and quit the driver.
     """
     driver.close()
     driver.quit()
-
-    return file_name
 
 
 if __name__ == '__main__':

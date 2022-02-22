@@ -1,7 +1,9 @@
+import os
+from pathlib import Path
 from selenium import webdriver
 
 from src.unogs.region_blocks import check_all_region_blocks, process_region_blocks
-from src.unogs import DEBUG, MAX_COUNT
+from src.unogs import MAX_COUNT
 from src.utils import save_pickle, load_pickle
 
 
@@ -37,12 +39,12 @@ def process_movie_entry(driver: webdriver, nfid: str, slug: str, title: str):
         }
         languages = process_region_blocks(driver, region_blocks, slug)
         data['languages'] = languages
-        save_pickle(data, f'{slug}.pickle')
+        save_pickle(data, Path(os.getcwd(), 'pickles', f'{slug}.pickle'))
 
         return languages
     else:
         data = None
-        save_pickle(data, f'{slug}.pickle')
+        save_pickle(data, Path(os.getcwd(), 'pickles', f'{slug}.pickle'))
         return None
 
 
@@ -85,7 +87,7 @@ def run_with_limit(netflix_nametags: list):
         """
 
         try:
-            data = load_pickle(f'{slug}.pickle')
+            data = load_pickle(Path(os.getcwd(), 'pickles', f'{slug}.pickle'))
         except FileNotFoundError:
             result = process_movie_entry(driver, nfid, slug, title)
         else:
@@ -142,7 +144,7 @@ def run_all_movies(netflix_nametags: list):
         print(f'Working on {slug}: [{count}/{total_count}]')
         result = None
         try:
-            data = load_pickle(f'{slug}.pickle')
+            data = load_pickle(Path(os.getcwd(), 'pickles', f'{slug}.pickle'))
         except FileNotFoundError:
             result = process_movie_entry(driver, nfid, slug, title)
         else:

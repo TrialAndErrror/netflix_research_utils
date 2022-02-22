@@ -3,8 +3,6 @@ import pickle
 from pathlib import Path
 import shutil
 
-from src.unogs import PICKLE_FOLDER
-
 
 def read_json(filename: Path):
     try:
@@ -34,15 +32,13 @@ def copy_file(file_path, dest_path):
         print("Permission denied.")
 
 
-def save_pickle(data, filename: str):
-    path = Path(PICKLE_FOLDER, filename)
+def save_pickle(data, path: Path):
 
     with open(path, 'w+b') as file:
         pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_pickle(filename):
-    path = Path(PICKLE_FOLDER, filename)
+def load_pickle(path: Path):
     with open(path, 'rb') as file:
         data = pickle.load(file)
     return data

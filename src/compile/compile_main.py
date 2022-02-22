@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.compile.functions.utils import PARTS_PATH, FILE_PATH, check_for_required_files, create_output_folder, \
+from src.compile.functions.utils import PARTS_PATH, check_for_required_files, create_output_folder, \
     clean_col_names, merge_grouped_and_google_trends, merge_unogs_and_google_trends, load_or_create_unogs_df
 from src.utils import read_json
 from src.compile.functions.clean_gt_data import clean_gt
@@ -20,12 +20,12 @@ def compile_main():
     """
     Setup directories and make sure all required files are present
     """
-    check_for_required_files()
+    file_path = check_for_required_files()
 
     """
     Load UNOGS dataframe and Google Trends Dataframe
     """
-    nf_nametags = read_json(FILE_PATH['nf_dict'])
+    nf_nametags = read_json(file_path['nf_dict'])
     unogs_df, grouped_df = load_or_create_unogs_df(nf_nametags)
 
     # grouped_df = load_or_create_grouped_df(nf_nametags, unogs_df)
@@ -34,7 +34,7 @@ def compile_main():
     Load Google Trends Dataframe
     """
     print('\nLoading Google Trends Data')
-    gt_data = clean_gt(FILE_PATH['trends'])
+    gt_data = clean_gt(file_path['trends'])
 
     """
     Merge UNOGS and Google Trends data
@@ -48,7 +48,7 @@ def compile_main():
     """
     print('\nLoading FlixPatrol Top 10 Data')
 
-    flixpatrol_points_dataframe = clean_flixpatrol_data(FILE_PATH['flix_top10'])
+    flixpatrol_points_dataframe = clean_flixpatrol_data(file_path['flix_top10'])
     final_df = final_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
     final_df = final_df[(final_df['Country'] == final_df['level_1']) | (final_df['level_1'].isna())]
     final_df.to_csv(Path(PARTS_PATH, '[p]unogs_gt_and_top10.csv'))
@@ -61,7 +61,7 @@ def compile_main():
     Load and Merge FlixPatrol Countries Data
     """
     print('\nLoading FlixPatrol Countries Data')
-    flixpatrol_countries_dataframe = clean_flix_countries(FILE_PATH['flix_country'])
+    flixpatrol_countries_dataframe = clean_flix_countries(file_path['flix_country'])
     final_df = final_df.merge(flixpatrol_countries_dataframe, left_on='slug', right_index=True, how='left')
     final_df.to_csv(Path(PARTS_PATH, '[p]unogs_gt_top10_and_countries.csv'))
 
@@ -87,6 +87,7 @@ def compile_main():
     grouped_df.to_csv(grouped_path)
 
     print('Compile Complete.')
+    return grouped_path
 
 
 if __name__ == '__main__':

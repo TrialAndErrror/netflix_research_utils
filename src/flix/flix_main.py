@@ -1,11 +1,7 @@
 import os
 from pathlib import Path
 
-from src.utils import write_json
-
-from src.flix import PICKLE_DIR, SUMMARY_DIR
 from src.flix.utils.directories import setup_directories
-from src.flix.utils.slug_utils import slugify_nf_dict
 from src.utils import read_json
 
 from src.flix.functions.info import make_info_dfs, flix_info
@@ -28,12 +24,6 @@ def run_all(nf_id_dict):
     """
     setup_directories()
 
-    # """
-    # Update titles where the slug does not match the FlixPatrol url.
-    # """
-    # slug_replace_dict, nf_id_dict = slugify_nf_dict(nf_id_dict)
-    # write_file(slug_replace_dict, Path(SUMMARY_DIR, 'slug_replace_dict.json'))
-
     """
     Gather all pickles from FlixPatrol data.
     """
@@ -50,8 +40,8 @@ def run_all(nf_id_dict):
     slug_replace_dict = {item['slug']: item['title'] for item in nf_id_dict}
 
     make_info_dfs(slug_replace_dict)
-    make_history_dfs(slug_replace_dict)
-    make_country_dfs(slug_replace_dict)
+    make_history_dfs()
+    make_country_dfs()
 
     print('\n\nResults saved.\n\n')
 
@@ -64,7 +54,8 @@ def flixpatrol_main():
 
     :return: None
     """
-    os.makedirs(PICKLE_DIR, exist_ok=True)
+    pickle_dir = Path(os.getcwd(), 'pickle_jar')
+    os.makedirs(pickle_dir, exist_ok=True)
     nf_dict_path = Path(os.getcwd(), 'netflix_nametags.json')
     if nf_dict_path.exists():
         data = read_json(nf_dict_path)
