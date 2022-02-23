@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.compile.functions.clean_gt_data import merge_unogs_and_gt
-from src.compile.functions.clean_unogs_data import clean_unogs
+from src.compile.functions.clean_unogs_data import clean_unogs, melt_grouped_df
 from src.compile.functions.make_groups import perform_make_exclusive
 
 
@@ -38,18 +38,26 @@ def create_output_folder():
     output_folder.mkdir(exist_ok=True, parents=True)
     return output_folder
 
+#
+# def clean_col_names(final_df, grouped_df):
+#     columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
+#     for col_name in columns_to_remove:
+#
+#         if col_name in final_df.columns:
+#             final_df = final_df.drop(col_name, axis=1)
+#
+#         if col_name in grouped_df.columns:
+#             grouped_df = grouped_df.drop(col_name, axis=1)
+#
+#     return final_df, grouped_df
 
-def clean_col_names(final_df, grouped_df):
+
+def new_clean_col_names(final_df):
     columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
     for col_name in columns_to_remove:
 
         if col_name in final_df.columns:
             final_df = final_df.drop(col_name, axis=1)
-
-        if col_name in grouped_df.columns:
-            grouped_df = grouped_df.drop(col_name, axis=1)
-
-    return final_df, grouped_df
 
 
 def merge_with_gt(df, gt_data, df_path):
@@ -64,11 +72,11 @@ def merge_with_gt(df, gt_data, df_path):
 
 
 def merge_grouped_and_google_trends(grouped_df, gt_data, parts_path):
-    return merge_with_gt(grouped_df, gt_data, Path(parts_path, '[p]grp_unogs_and_gt.csv'))
+    return merge_with_gt(grouped_df, gt_data, Path(parts_path, '[p]unogs_and_gt.csv'))
 
-
-def merge_unogs_and_google_trends(unogs_df, gt_data, parts_path):
-    return merge_with_gt(unogs_df, gt_data, Path(parts_path, '[p]unogs_and_gt.csv'))
+#
+# def merge_unogs_and_google_trends(unogs_df, gt_data, parts_path):
+#     return merge_with_gt(unogs_df, gt_data, Path(parts_path, '[p]unogs_and_gt.csv'))
 
 
 def load_or_create_unogs_df(nf_originals, file_path, parts_path):
@@ -92,4 +100,14 @@ def load_or_create_unogs_df(nf_originals, file_path, parts_path):
     else:
         grouped_df = pd.read_csv(grouped_df_path)
 
-    return unogs_df, grouped_df
+    print('\nMelting UNOGS Data')
+    melted_df_path = Path(parts_path, '[p]melt_unogs_df.csv')
+    if not melted_df_path.exists():
+        grp_col_list = ['title', 'Original Language', 'Country', 'slug']
+        grp_col_list.extend([item for item in grouped_df.columns if item.startswith('grp')])
+        melted_df = melt_grouped_df(grouped_df[grp_col_list])
+        melted_df.to_csv(grouped_df_path)
+    else:
+        melted_df = pd.read_csv(melted_df_path)
+
+    return melted_df

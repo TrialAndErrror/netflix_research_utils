@@ -27,21 +27,21 @@ def run_all(nf_id_dict):
     """
     Gather all pickles from FlixPatrol data.
     """
-    print('FlixFetch: fetching movie info')
-    flix_info(nf_id_dict)
-    print('fetching movie history')
-    flix_history(nf_id_dict)
-    print('fetching movie countries')
-    flix_countries(nf_id_dict)
+    # print('FlixFetch: fetching movie info')
+    # flix_info(nf_id_dict)
+    # print('fetching movie history')
+    # flix_history(nf_id_dict)
+    # print('fetching movie countries')
+    # flix_countries(nf_id_dict)
 
     """
     Process pickles into DataFrames.
     """
     slug_replace_dict = {item['slug']: item['title'] for item in nf_id_dict}
 
-    make_info_dfs(slug_replace_dict)
-    make_history_dfs()
-    make_country_dfs()
+    make_info_dfs(slug_replace_dict, nf_id_dict)
+    make_history_dfs(nf_id_dict)
+    make_country_dfs(nf_id_dict)
 
     print('\n\nResults saved.\n\n')
 

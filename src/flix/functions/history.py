@@ -3,6 +3,7 @@ from typing import List, Tuple, Text
 
 import pandas as pd
 from bs4 import BeautifulSoup
+from slugify import slugify
 
 from src.flix import get_summary_dir, get_pickle_dir
 from src.flix.utils.debug_messages import print_red, print_green
@@ -80,7 +81,7 @@ def read_history_soup(filename) -> (Text, List[Tuple[str, pd.DataFrame]]):
     return title, results
 
 
-def make_history_dfs():
+def make_history_dfs(nf_dict):
     """
     Make Dataframes from all History Pickles.
 
@@ -94,7 +95,10 @@ def make_history_dfs():
     """
     print('Working on History')
     history_dict = {}
-    history_files = list(Path(get_pickle_dir(), 'history').glob("*.pickle"))
+    pickle_file_list = [f'{item["slug"]}' for item in nf_dict]
+    slugged_title_list = [f'{slugify(item["title"])}' for item in nf_dict]
+
+    history_files = [item for item in Path(get_pickle_dir(), 'history').iterdir() if (item.stem in pickle_file_list or item.stem in slugged_title_list)]
     files_count = len(history_files)
     counter = 1
 

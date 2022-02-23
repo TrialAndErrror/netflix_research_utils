@@ -3,6 +3,7 @@ from typing import Optional, List, Text
 
 import pandas as pd
 from bs4 import BeautifulSoup
+from slugify import slugify
 
 from src.flix import get_summary_dir, get_pickle_dir
 from src.flix.utils.debug_messages import print_red, print_green
@@ -78,7 +79,7 @@ def read_country_soup(filename: Path) -> (Text, List):
     return title, results
 
 
-def make_country_dfs():
+def make_country_dfs(nf_dict):
     """
     Make Dataframes from all Country Pickles.
 
@@ -92,7 +93,10 @@ def make_country_dfs():
     """
     print('Working on Languages')
     country_dict = {}
-    country_files = list(Path(get_pickle_dir(), "language").glob("*.pickle"))
+
+    pickle_file_list = [f'{item["slug"]}' for item in nf_dict]
+    slugged_title_list = [f'{slugify(item["title"])}' for item in nf_dict]
+    country_files = [item for item in Path(get_pickle_dir(), "country").iterdir() if (item.stem in pickle_file_list or item.stem in slugged_title_list)]
     files_count = len(country_files)
     counter = 1
 

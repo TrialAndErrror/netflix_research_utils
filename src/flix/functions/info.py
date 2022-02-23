@@ -4,6 +4,7 @@ from typing import Tuple
 
 import pandas as pd
 from bs4 import BeautifulSoup
+from slugify import slugify
 
 from src.flix import get_summary_dir, get_pickle_dir
 from src.flix.utils.debug_messages import print_green
@@ -100,7 +101,7 @@ def read_info_soup(filename) -> (str, Tuple[str, pd.DataFrame], str):
     return title, results, result_date
 
 
-def make_info_dfs(slug_replace_dict):
+def make_info_dfs(slug_replace_dict, nf_dict):
     """
     Make Dataframes from all Info Pickles.
 
@@ -114,7 +115,11 @@ def make_info_dfs(slug_replace_dict):
     """
     Load all Info pickles.
     """
-    info_files = list(Path(get_pickle_dir(), 'info').glob("*.pickle"))
+    pickle_file_list = [f'{item["slug"]}' for item in nf_dict]
+    slugged_title_list = [f'{slugify(item["title"])}' for item in nf_dict]
+
+    info_files = [item for item in Path(get_pickle_dir(), 'info').iterdir() if (item.stem in pickle_file_list or item.stem in slugged_title_list)]
+
     files_count = len(info_files)
 
     """

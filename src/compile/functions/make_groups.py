@@ -51,13 +51,13 @@ def set_exclusive_columns(row, language):
     sub_col = f'sub_{language}'
     dub_col = f'dub_{language}'
 
-    row[f'grp_sub_only_{language}'] = get_sub_only(row, sub_col, dub_col)
-    row[f'grp_dub_only_{language}'] = get_dub_only(row, sub_col, dub_col)
+    row[f'grp_sub_{language}'] = get_sub_only(row, sub_col, dub_col)
+    row[f'grp_dub_{language}'] = get_dub_only(row, sub_col, dub_col)
     row[f'grp_both_{language}'] = get_sub_and_dub(row, sub_col, dub_col)
 
     row[f'grp_neither_{language}'] = bool(
-            int(row[f'grp_sub_only_{language}'])
-            + int(row[f'grp_dub_only_{language}'])
+            int(row[f'grp_sub_{language}'])
+            + int(row[f'grp_dub_{language}'])
             + int(row[f'grp_both_{language}'])
             < 1
     )

@@ -52,6 +52,23 @@ MANUAL_REMOVAL = [
         '',
 ]
 
+REPLACE_DICT = {
+    'sub_English (India)': 'sub_English',
+    'sub_Arabic (Egypt)': 'sub_Arabic',
+    'sub_Serbian (Latin)': 'sub_Serbian',
+    'sub_Arabic (Lebanon)': 'sub_Arabic',
+    'sub_Traditional Chinese (Hong Kong SAR China)': 'sub_Traditional Chinese',
+    'sub_Arabic (Saudi Arabia)': 'sub_Arabic',
+    'sub_European Spanish': 'sub_Spanish',
+
+    'dub_Mandarin (Putonghua)': 'dub_Mandarin',
+    'dub_Arabic (Palestine)': 'dub_Arabic',
+    'dub_Arabic (Syria)': 'dub_Arabic',
+    'dub_Arabic (Egypt)': 'dub_Arabic',
+    'dub_Mandarin (Guoyu)': 'dub_Mandarin',
+    'dub_European Spanish': 'dub_Spanish',
+}
+
 
 def find_and_remove_pattern(pattern, mylist):
     """
@@ -117,21 +134,6 @@ def perform_all_cleaning(col_list):
 
 
 def replace_columns(df):
-    replace_dict = {
-        'sub_English (India)': 'sub_English',
-        'sub_Arabic (Egypt)': 'sub_Arabic',
-        'sub_Serbian (Latin)': 'sub_Serbian',
-        'sub_Arabic (Lebanon)': 'sub_Arabic',
-        'sub_Traditional Chinese (Hong Kong SAR China)': 'sub_Traditional Chinese',
-        'sub_Arabic (Saudi Arabia)': 'sub_Arabic',
-
-        'dub_Mandarin (Putonghua)': 'dub_Mandarin',
-        'dub_Arabic (Palestine)': 'dub_Arabic',
-        'dub_Arabic (Syria)': 'dub_Arabic',
-        'dub_Arabic (Egypt)': 'dub_Arabic',
-        'dub_Mandarin (Guoyu)': 'dub_Mandarin'
-    }
-
     def consolidate_column(row, replace_dict):
         for key, value in replace_dict.items():
             try:
@@ -140,8 +142,8 @@ def replace_columns(df):
                 pass
 
     def consolidate_all_columns(df):
-        df.apply(lambda x: consolidate_column(x, replace_dict), axis=1)
-        languages_to_drop = list(replace_dict.keys())
+        df.apply(lambda x: consolidate_column(x, REPLACE_DICT), axis=1)
+        languages_to_drop = list(REPLACE_DICT.keys())
         sub_df = df.drop(languages_to_drop, axis=1, errors='ignore')
         return sub_df
 
@@ -152,5 +154,23 @@ def clean_unogs(unogs_df: pd.DataFrame):
     col_list = perform_all_cleaning(unogs_df.columns)
     cleaned_unogs_df = unogs_df[col_list]
     # cleaned_unogs_df.to_csv('clean_unogs_df.csv')
-    return replace_columns(cleaned_unogs_df)
+    result = replace_columns(cleaned_unogs_df)
+    return result
 
+
+def melt_grouped_df(grouped_df):
+    melted_df = pd.melt(grouped_df, id_vars=['title', 'Original Language', 'Country', 'slug'],
+                        value_vars=[item for item in list(grouped_df.columns) if item.startswith('grp')])
+
+    melted_df['Group'], melted_df['Language'] = melted_df['variable'].apply(lambda x: x.split('_')[1]), melted_df[
+        'variable'].apply(lambda x: x.split('_')[-1])
+
+    melted_df = melted_df.rename(columns={'value': 'Group Value'})
+
+    melted_df = melted_df[
+        ['title', 'Original Language', 'Country', 'Group', 'Language', 'Group Value', 'slug']]
+
+    melted_df_true_only = melted_df[melted_df['Group Value'] == True][
+        ['title', 'Original Language', 'Country', 'Group', 'Language', 'slug']
+    ]
+    return melted_df
