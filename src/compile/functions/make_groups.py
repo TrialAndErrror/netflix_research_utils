@@ -58,7 +58,7 @@ def set_exclusive_columns(row, language):
     row[f'grp_neither_{language}'] = bool(
             int(row[f'grp_sub_only_{language}'])
             + int(row[f'grp_dub_only_{language}'])
-            + int(row[f'grp_dub_only_{language}'])
+            + int(row[f'grp_both_{language}'])
             < 1
     )
 

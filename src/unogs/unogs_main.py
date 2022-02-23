@@ -22,7 +22,7 @@ def get_subs_and_dubs():
     else:
         run_all_movies(nf_dict)
 
-    return run_all_pickles(pickle_folder)
+    return run_all_pickles(pickle_folder, nf_dict)
 
 
 def unogs_main():

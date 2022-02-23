@@ -4,11 +4,12 @@ import pandas as pd
 from pathlib import Path
 from src.pickle_farm.models import PickleReader
 from datetime import datetime
+from slugify import slugify
 
 
-def run_all_pickles(pickle_dir: Path or str):
+def run_all_pickles(pickle_dir: Path or str, nf_dict: dict):
     """
-    Process all pickles and save as dataframes.
+    Process all pickles contained in netflix dict and save as dataframes.
 
     :return: None
     """
@@ -22,8 +23,13 @@ def run_all_pickles(pickle_dir: Path or str):
     """
     Process all pickles from pickle_folder, returning a dataframe and list of errors
     """
-    language_list = get_languages_list(pickle_folder.iterdir())
-    df, error_list = process_pickles_into_df(pickle_folder.iterdir(), language_list)
+    pickle_file_list = [f'{item["slug"]}' for item in nf_dict]
+    slugged_title_list = [f'{slugify(item["title"])}' for item in nf_dict]
+
+    pickle_files = [item for item in pickle_folder.iterdir() if (item.stem in pickle_file_list or item.stem in slugged_title_list)]
+
+    language_list = get_languages_list(pickle_files)
+    df, error_list = process_pickles_into_df(pickle_files, language_list)
 
     """
     Save dataframe to output folder
