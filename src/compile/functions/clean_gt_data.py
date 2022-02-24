@@ -1,5 +1,4 @@
-import pandas as pd
-
+from src.compile import pd
 
 def get_gt_column(row):
     country = row['Country']
@@ -16,7 +15,11 @@ def merge_unogs_and_gt(unogs_df, gt_data):
         'Original Language',
         'Country',
         'Group',
+        'Group Value',
         'Language',
+        'Primary Language',
+        'Secondary Language',
+        'Tertiary Language',
         'Google Trends Score',
         'slug'
     ]

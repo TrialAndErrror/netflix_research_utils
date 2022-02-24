@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-import pandas as pd
+from src.compile import pd
 
 from src.compile.functions.clean_gt_data import merge_unogs_and_gt
 from src.compile.functions.clean_unogs_data import clean_unogs, melt_grouped_df
@@ -38,19 +38,6 @@ def create_output_folder():
     output_folder.mkdir(exist_ok=True, parents=True)
     return output_folder
 
-#
-# def clean_col_names(final_df, grouped_df):
-#     columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
-#     for col_name in columns_to_remove:
-#
-#         if col_name in final_df.columns:
-#             final_df = final_df.drop(col_name, axis=1)
-#
-#         if col_name in grouped_df.columns:
-#             grouped_df = grouped_df.drop(col_name, axis=1)
-#
-#     return final_df, grouped_df
-
 
 def new_clean_col_names(final_df):
     columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
@@ -64,7 +51,11 @@ def new_clean_col_names(final_df):
         'Original Language',
         'Country',
         'Group',
+        'Group Value',
         'Language',
+        'Primary Language',
+        'Secondary Language',
+        'Tertiary Language',
         'Google Trends Score',
         'slug',
         'Points',
@@ -73,19 +64,16 @@ def new_clean_col_names(final_df):
         'Country Top 10'
     ]
 
-    """
-    Need to add in primary/secondary/tertiary columns
-    """
-    return final_df
+    return final_df[final_columns]
 
 
 def merge_with_gt(df, gt_data, df_path):
 
-    # if not df_path.exists():
-    #     result = merge_unogs_and_gt(df, gt_data)
-    #     result.to_csv()
-    # else:
-    #     result = pd.read_csv(df_path)
+    if not df_path.exists():
+        result = merge_unogs_and_gt(df, gt_data)
+        result.to_csv()
+    else:
+        result = pd.read_csv(df_path)
     result = merge_unogs_and_gt(df, gt_data)
 
     return result
@@ -126,8 +114,9 @@ def load_or_create_unogs_df(nf_originals, file_path, parts_path):
         grp_col_list = ['title', 'Original Language', 'Country', 'slug']
         grp_col_list.extend([item for item in grouped_df.columns if item.startswith('grp')])
         melted_df = melt_grouped_df(grouped_df[grp_col_list])
-        melted_df = melted_df[melted_df['Group Value'] == True]
-        melted_df = melted_df[['title', 'Original Language', 'Country', 'Group', 'Language', 'slug']]
+        melted_df = melted_df[
+            ['title', 'Original Language', 'Country', 'Group', 'Group Value', 'Language', 'slug']
+        ]
         melted_df.to_csv(melted_df_path)
     else:
         melted_df = pd.read_csv(melted_df_path, dtype={

@@ -1,6 +1,6 @@
 import re
 
-import pandas as pd
+from src.compile import pd
 
 REMOVE_LIST = [
         'Unnamed: 0',

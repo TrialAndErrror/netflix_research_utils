@@ -1,4 +1,4 @@
-import pandas as pd
+from src.compile import pd
 import numpy as np
 
 from src.utils import read_json
@@ -64,7 +64,7 @@ def replace_indices_with_country(flix_dict):
                 # Get the values and assign them to the inner dictionary
                 for key, values_dict in data_dict.items():
                     if key.strip() not in value_exclude_list:
-                        results[movie_title][entry][key] = values_dict.get(index)
+                        results[movie_title][entry][key] = values_dict.get(str(index))
 
     return results
 
@@ -85,32 +85,12 @@ def make_into_dataframe(target_dict):
     return pd.DataFrame(df[0].values.tolist(), index=df.index)
 
 
-# def clean_flixpatrol_columns(dataframe, title):
-#     return dataframe.rename(columns={
-#         'Points': f'{title} Points',
-#         'Days': f'{title} Days',
-#         'ø/day': f'{title} ø/day'
-#     })
-#
-#
-# def clean_netflix_columns(dataframe, title):
-#     return dataframe.rename(columns={
-#         'Points': f'{title} Points',
-#         'Weeks': f'{title} Weeks'
-#     })
-
-
 def prepare_dataframes_to_join(cleaned_movies_history):
-    # clean_netflix_overall_df = clean_flixpatrol_columns(
-    #     make_into_dataframe(
-    #         replace_indices_with_country(cleaned_movies_history)
-    #     ), 'Movies')
-
     clean_netflix_overall_df = make_into_dataframe(
             replace_indices_with_country(cleaned_movies_history)
         )
 
-    clean_netflix_overall_df[['Points', 'ø/day']] = clean_netflix_overall_df[['Points', 'ø/day']].fillna(0)
+    # clean_netflix_overall_df[['Points', 'ø/day']] = clean_netflix_overall_df[['Points', 'ø/day']].fillna(0)
 
     return clean_netflix_overall_df
 
@@ -127,7 +107,7 @@ def clean_flixpatrol_data(history_file):
 
     dataframe = prepare_dataframes_to_join(cleaned_movies_history)
     dataframe = dataframe.reset_index()
-    dataframe[['Points', 'ø/day']] = dataframe[['Points', 'ø/day']].fillna(0)
+    dataframe['Days'] = dataframe['Days'].apply(lambda x: str(x).split(' ')[0]).astype("int16")
     dataframe['Points'] = dataframe['Points'].astype("int16")
     dataframe['ø/day'] = dataframe['ø/day'].astype("float")
     dataframe = dataframe.rename(columns={'level_0': 'slug',
@@ -138,7 +118,7 @@ def clean_flixpatrol_data(history_file):
 def add_missing_countries_to_data_dict(data_dict):
     for country in ALL_COUNTRIES:
         if country not in data_dict['Country'].values():
-            index_num = len(data_dict['Country'])
+            index_num = str(len(data_dict['Country']))
             data_dict['Country'][index_num] = country
             data_dict['Points'][index_num] = 0
             data_dict['Unnamed: 2'][index_num] = np.nan
