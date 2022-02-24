@@ -60,6 +60,7 @@ REPLACE_DICT = {
     'sub_Traditional Chinese (Hong Kong SAR China)': 'sub_Traditional Chinese',
     'sub_Arabic (Saudi Arabia)': 'sub_Arabic',
     'sub_European Spanish': 'sub_Spanish',
+    'sub_British English': 'sub_English',
 
     'dub_Mandarin (Putonghua)': 'dub_Mandarin',
     'dub_Arabic (Palestine)': 'dub_Arabic',
@@ -67,6 +68,8 @@ REPLACE_DICT = {
     'dub_Arabic (Egypt)': 'dub_Arabic',
     'dub_Mandarin (Guoyu)': 'dub_Mandarin',
     'dub_European Spanish': 'dub_Spanish',
+    'dub_British English': 'dub_English',
+
 }
 
 

@@ -85,26 +85,32 @@ def make_into_dataframe(target_dict):
     return pd.DataFrame(df[0].values.tolist(), index=df.index)
 
 
-def clean_flixpatrol_columns(dataframe, title):
-    return dataframe.rename(columns={
-        'Points': f'{title} Points',
-        'Days': f'{title} Days',
-        'ø/day': f'{title} ø/day'
-    })
-
-
-def clean_netflix_columns(dataframe, title):
-    return dataframe.rename(columns={
-        'Points': f'{title} Points',
-        'Weeks': f'{title} Weeks'
-    })
+# def clean_flixpatrol_columns(dataframe, title):
+#     return dataframe.rename(columns={
+#         'Points': f'{title} Points',
+#         'Days': f'{title} Days',
+#         'ø/day': f'{title} ø/day'
+#     })
+#
+#
+# def clean_netflix_columns(dataframe, title):
+#     return dataframe.rename(columns={
+#         'Points': f'{title} Points',
+#         'Weeks': f'{title} Weeks'
+#     })
 
 
 def prepare_dataframes_to_join(cleaned_movies_history):
-    clean_netflix_overall_df = clean_flixpatrol_columns(
-        make_into_dataframe(
+    # clean_netflix_overall_df = clean_flixpatrol_columns(
+    #     make_into_dataframe(
+    #         replace_indices_with_country(cleaned_movies_history)
+    #     ), 'Movies')
+
+    clean_netflix_overall_df = make_into_dataframe(
             replace_indices_with_country(cleaned_movies_history)
-        ), 'Movies')
+        )
+
+    clean_netflix_overall_df[['Points', 'ø/day']] = clean_netflix_overall_df[['Points', 'ø/day']].fillna(0)
 
     return clean_netflix_overall_df
 
@@ -120,8 +126,13 @@ def clean_flixpatrol_data(history_file):
         cleaned_movies_history[key] = data_dict
 
     dataframe = prepare_dataframes_to_join(cleaned_movies_history)
-
-    return dataframe.reset_index()
+    dataframe = dataframe.reset_index()
+    dataframe[['Points', 'ø/day']] = dataframe[['Points', 'ø/day']].fillna(0)
+    dataframe['Points'] = dataframe['Points'].astype("int16")
+    dataframe['ø/day'] = dataframe['ø/day'].astype("float")
+    dataframe = dataframe.rename(columns={'level_0': 'slug',
+                                          'level_1': 'Country'})
+    return dataframe
 
 
 def add_missing_countries_to_data_dict(data_dict):

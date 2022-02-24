@@ -7,6 +7,9 @@ from src.compile.functions.clean_gt_data import clean_gt
 from src.compile.functions.clean_flix_top10 import clean_flixpatrol_data
 from src.compile.functions.clean_flix_countries import clean_flix_countries, merge_with_flix_countries
 
+# import ray
+# ray.init()
+
 
 def compile_main():
     """
@@ -46,9 +49,16 @@ def compile_main():
     print('\nLoading FlixPatrol Top 10 Data')
 
     flixpatrol_points_dataframe = clean_flixpatrol_data(file_path['flix_top10'])
+
     flixpatrol_points_dataframe.to_csv(Path(parts_path, 'flixpatrol_top10_df.csv'))
-    final_df = final_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
-    final_df = final_df[(final_df['Country'] == final_df['level_1']) | (final_df['level_1'].isna())]
+    final_df = final_df.merge(
+        flixpatrol_points_dataframe,
+        left_on=['slug', 'Country'],
+        right_on=['slug', 'Country'],
+        how='left'
+    )
+
+    # final_df = final_df[(final_df['Country'] == final_df['level_1']) | (final_df['level_1'].isna())]
     final_df.to_csv(Path(parts_path, '[p]unogs_gt_and_top10.csv'))
 
     # grouped_df = grouped_df.merge(flixpatrol_points_dataframe, left_on='slug', right_on='level_0', how='left')
@@ -85,7 +95,7 @@ def compile_main():
     # grouped_df.to_csv(grouped_path)
 
     print('Compile Complete.')
-    return final_df
+    return final_path
 
 
 if __name__ == '__main__':

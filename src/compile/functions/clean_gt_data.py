@@ -9,22 +9,20 @@ def get_gt_column(row):
 
 def merge_unogs_and_gt(unogs_df, gt_data):
     test = unogs_df.copy()
-    sample = test.merge(gt_data, left_on='slug', right_on='slug', how='left')
-    sample['google_trends_score'] = sample.apply(lambda x: get_gt_column(x), axis=1)
+    sample = test.merge(gt_data, left_on=['title', 'slug', 'Country'], right_on=['title', 'slug', 'Country'], how='left')
+    sample = sample.rename(columns={'value': 'Google Trends Score'})
     remaining_columns = [
         'title',
         'Original Language',
         'Country',
-        'google_trends_score'
+        'Group',
+        'Language',
+        'Google Trends Score',
+        'slug'
     ]
-    remaining_columns.extend(
-        [
-            item for item in sample.columns
-            if (item.startswith('sub_') or item.startswith('dub_') or item.startswith('grp_'))
-        ]
-    )
-    remaining_columns.append('slug')
     sample = sample[remaining_columns]
+    sample['Google Trends Score'] = sample['Google Trends Score'].fillna(0)
+    sample['Google Trends Score'] = sample['Google Trends Score'].astype(int)
     return sample
 
 
@@ -35,7 +33,10 @@ def clean_gt(file_path):
     Rename country columns with gt_ prefix.
     """
     gt_data = pd.read_csv(file_path)
-    col_dict = {item: f'gt_{item}' for item in gt_data.columns if item != 'slug'}
-    gt_data = gt_data.rename(col_dict, axis=1)
+    # col_dict = {item: f'gt_{item}' for item in gt_data.columns if item != 'slug'}
+    # gt_data = gt_data.rename(col_dict, axis=1)
 
-    return gt_data
+    melted = gt_data.drop(columns=['Unnamed: 0'])
+    melted = melted.melt(id_vars=['title', 'slug'])
+    melted = melted.rename(columns={'variable': 'Country'})
+    return melted
