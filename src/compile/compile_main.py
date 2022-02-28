@@ -3,13 +3,14 @@ from pathlib import Path
 from src.compile import pd
 
 from src.compile.functions.utils import check_for_required_files, create_output_folder, \
-    new_clean_col_names, merge_grouped_and_google_trends, load_or_create_unogs_df
+    new_clean_col_names, load_or_create_unogs_df
 from src.utils import read_json
-from src.compile.functions.clean_gt_data import clean_gt
+from src.compile.functions.clean_gt_data import clean_gt, merge_unogs_and_gt
 from src.compile.functions.clean_flix_top10 import clean_flixpatrol_data
-from src.compile.functions.clean_flix_countries import clean_flix_countries, merge_with_flix_countries
+from src.compile.functions.clean_flix_countries import merge_with_flix_countries
 
-#
+import ray
+ray.init()
 
 
 def compile_main():
@@ -32,7 +33,7 @@ def compile_main():
     nf_nametags = read_json(file_path['nf_dict'])
     melted_df = load_or_create_unogs_df(nf_nametags, file_path, parts_path)
 
-    top_3_languages_df = pd.read_csv('/home/wade/PycharmProjects/chetflix/src/compile/inputs/top_3_languages.csv')
+    top_3_languages_df = pd.read_csv(Path(input_path, 'top_3_languages.csv'))
     melted_df = pd.merge(melted_df, top_3_languages_df[
         ['Country', 'Primary Language', 'Secondary Language', 'Tertiary Language']
     ], how='left', left_on='Country', right_on='Country')
@@ -46,7 +47,7 @@ def compile_main():
     """
     Merge UNOGS and Google Trends data
     """
-    final_df = merge_grouped_and_google_trends(melted_df, gt_data, parts_path)
+    final_df = merge_unogs_and_gt(melted_df, gt_data)
 
     """
     Load and Merge FlixPatrol Top 10 Overall Data
@@ -76,6 +77,8 @@ def compile_main():
     Be sure to remove any unnecessary columns before saving.
     """
     final_df = new_clean_col_names(final_df)
+    if 'Unnamed: 0' in final_df.columns:
+        final_df = final_df.drop(columns=['Unnamed: 0'])
     """
     Save Final Results
     """
@@ -87,6 +90,16 @@ def compile_main():
     final_short_path = Path(output_folder, "final_short_dataset.csv")
     final_short_df = final_df[final_df['Group Value'] == True].drop(columns=['Group Value'])
     final_short_df.to_csv(final_short_path)
+
+    """
+    Split data based on Wiki groups
+    """
+    wiki_groups = read_json(Path(input_path, 'wiki_groups.json'))
+    group_output_folder = Path(output_folder, 'wiki_groups')
+    group_output_folder.mkdir(exist_ok=True)
+    for group, title_list in wiki_groups.items():
+        group_df = final_short_df[final_short_df['title'].isin(title_list)]
+        group_df.to_csv(Path(group_output_folder, f'Group Data - {group}.csv'))
 
     print('Compile Complete.')
     return final_path

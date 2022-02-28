@@ -33,6 +33,8 @@ class WikiAnalyzer:
         self.all_wiki_titles = []
         self.all_dataset_titles = []
 
+        self.json_output = {}
+
     @staticmethod
     def help():
         info = {
@@ -65,13 +67,18 @@ class WikiAnalyzer:
         print(f'Total count of titles identified: {len(self.all_dataset_titles)}')
         print(f'Total missing films: {len(self.leftovers)}')
 
+        return self.json_output
+
     def _split_titles_into_lists(self):
         self.dataset_split_dict['Standup'] = self._split_data(self.nf_titles, self.results_dict['Standup'])
+        self.json_output['Standup'] = self._split_data(self.nf_titles, self.results_dict['Standup'])
         self.dataset_split_dict['Distribution'] = self._split_data(self.nf_titles, self.results_dict['Distribution'])
+        self.json_output['Distribution'] = self._split_data(self.nf_titles, self.results_dict['Distribution'])
 
         self.dataset_split_dict['Films'] = dict()
         for year, titles in self.results_dict['Films'].items():
             self.dataset_split_dict['Films'][year] = self._split_data(self.nf_titles, titles)
+            self.json_output[f'Films {year}'] = self._split_data(self.nf_titles, titles)
 
     def _make_master_lists(self):
         total_list = self.results_dict['Standup'] + self.results_dict['Distribution']

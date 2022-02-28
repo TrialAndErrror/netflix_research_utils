@@ -2,8 +2,18 @@ from src.wiki.wiki_models import WikiAnalyzer, WIKI_URLS
 import json
 
 
-if __name__ == '__main__':
-    with open('final_nf_dict.json', 'r') as file:
-        titles_list = json.load(file).keys()
+def wiki_main():
+    with open('netflix_nametags.json', 'r') as file:
+        titles_list = [item['title'] for item in json.load(file)]
+
     wiki_obj = WikiAnalyzer(titles_list, WIKI_URLS)
-    wiki_obj.run_all()
+    data_output = wiki_obj.run_all()
+
+    with open('wiki_output.json', 'w+') as outfile:
+        json.dump(data_output, outfile)
+
+    print('Wiki Data Retrieved.\n')
+
+
+if __name__ == '__main__':
+    wiki_main()

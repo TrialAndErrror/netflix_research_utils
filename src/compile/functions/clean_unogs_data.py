@@ -18,19 +18,9 @@ REMOVE_LIST = [
 ]
 
 MANUAL_REMOVAL = [
-        # 'sub_Arabic (Saudi Arabia)',
-        # 'sub_Traditional Chinese (Hong Kong SAR China)',
-        # 'sub_Arabic (Egypt)',
-        # 'sub_Canadian French',
-        # 'sub_Serbian (Latin)',
-        # 'sub_Brazilian Portuguese',
-        # 'sub_Mandarin',
-        # 'sub_Mandarin (Guoyu)',
         'dub_European Spanish [English-Delayed]',
         'dub_Polish - Dubbing',
-        # 'dub_Mandarin (Putonghua)',
         'dub_English [Hindi-Delayed]',
-        # 'dub_Polish - Lektor',
         'dub_European Spanish [English-Pending]',
         'dub_Brazilian Portuguese [English-Pending]',
         'dub_Hindi [English-Delayed]',
@@ -38,17 +28,12 @@ MANUAL_REMOVAL = [
         'dub_Hindi [English-Pending]',
         'dub_I',
         'dub_Polish -',
-        # 'dub_Mandarin (Guoyu)',
         'dub_Br',
-        # 'dub_Arabic (Palestine)',
         'dub_European Spanish - Dubbed',
         'dub_Brazilian Portuguese [English-Delayed]',
-        # 'dub_Arabic (Egypt)',
         'dub_Brazilian Portugues',
         'dub_Portugues',
-        # 'dub_Mexican Spanish',
         'dub_Spanish -',
-        # 'dub_Brazilian',
         '',
 ]
 
@@ -61,6 +46,8 @@ REPLACE_DICT = {
     'sub_Arabic (Saudi Arabia)': 'sub_Arabic',
     'sub_European Spanish': 'sub_Spanish',
     'sub_British English': 'sub_English',
+    'sub_Polish - Lektor': 'sub_Polish',
+    'sub_Brazilian Portuguese': 'sub_Portuguese',
 
     'dub_Mandarin (Putonghua)': 'dub_Mandarin',
     'dub_Arabic (Palestine)': 'dub_Arabic',
@@ -69,6 +56,10 @@ REPLACE_DICT = {
     'dub_Mandarin (Guoyu)': 'dub_Mandarin',
     'dub_European Spanish': 'dub_Spanish',
     'dub_British English': 'dub_English',
+    'dub_Polish - Lektor': 'dub_Polish',
+    'dub_Mexican Spanish': 'dub_Spanish',
+    'dub_Brazilian': 'dub_Portuguese',
+    'dub_Brazilian Portuguese': 'dub_Portuguese'
 
 }
 
@@ -119,7 +110,6 @@ def remove_specific_columns(mylist):
     Remove extra specified columns.
     """
     removal_list = REMOVE_LIST + MANUAL_REMOVAL
-    # removal_list = REMOVE_LIST
     return [item for item in mylist if item not in removal_list]
 
 
@@ -153,15 +143,14 @@ def replace_columns(df):
     return consolidate_all_columns(df)
 
 
-def clean_unogs(unogs_df: pd.DataFrame):
+def clean_unogs(unogs_df: pd.DataFrame) -> pd.DataFrame:
     col_list = perform_all_cleaning(unogs_df.columns)
     cleaned_unogs_df = unogs_df[col_list]
-    # cleaned_unogs_df.to_csv('clean_unogs_df.csv')
     result = replace_columns(cleaned_unogs_df)
     return result
 
 
-def melt_grouped_df(grouped_df):
+def melt_grouped_df(grouped_df) -> pd.DataFrame:
     melted_df = pd.melt(grouped_df, id_vars=['title', 'Original Language', 'Country', 'slug'],
                         value_vars=[item for item in list(grouped_df.columns) if item.startswith('grp')])
 

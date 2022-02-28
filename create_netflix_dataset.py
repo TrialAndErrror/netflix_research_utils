@@ -8,14 +8,19 @@ from src.nametags.main import nametag_main
 from src.unogs.unogs_main import unogs_main
 from src.trends.trends_main import trends_main
 from src.flix.flix_main import flixpatrol_main
+from src.wiki.wiki_main import wiki_main
 from src.compile.compile_main import compile_main
 
 
-def chetflix_main():
+def create_netflix_dataset_main():
     """
     Run all Netflix Processing functions
 
     :return: None
+    """
+
+    """
+    Setup Directories
     """
     home_dir = Path(os.getcwd())
     src_dir = Path(home_dir, 'src')
@@ -25,6 +30,14 @@ def chetflix_main():
     for path in [home_dir, src_dir, compile_folder, nametag_folder]:
         if not path.exists():
             path.mkdir(parents=True, exist_ok=True)
+
+    """
+    Check to make sure the top_3_languages data is in the right folder.
+    
+    This is the only piece of data that has to be hand created.
+    """
+    if not Path(compile_folder, 'top_3_languages.csv').exists():
+        raise FileNotFoundError(f'Place Top 3 Languages Dataframe in {compile_folder}')
 
     """
     Run WON Gatherer to get nf_dict.json
@@ -62,6 +75,7 @@ def chetflix_main():
     copy_file(nametags_file, Path(src_dir, 'trends', 'netflix_nametags.json'))
     copy_file(nametags_file, Path(src_dir, 'flix', 'netflix_nametags.json'))
     copy_file(nametags_file, Path(src_dir, 'compile', 'inputs', 'netflix_nametags.json'))
+    copy_file(nametags_file, Path(src_dir, 'won', 'netflix_nametags.json'))
 
     """
     Run UNOGS data
@@ -105,6 +119,19 @@ def chetflix_main():
     copy_file(Path(flixpatrol_folder, 'summary', 'country_results.json'), Path(compile_folder, 'country_results.json'))
 
     """
+    Run Wiki Fetch
+    
+    1. Chdir to src/wiki
+    2. Run wiki_main
+    3. Copy wiki/wiki_output.json to compile/input/wiki_groups.json
+    """
+    wiki_folder = Path(src_dir, 'wiki')
+
+    os.chdir(wiki_folder)
+    wiki_main()
+    copy_file(Path(wiki_folder, 'wiki_output.json'), Path(compile_folder, 'wiki_groups.json'))
+
+    """
     Run Compile
     
     1. Chdir to src/compile
@@ -117,4 +144,4 @@ def chetflix_main():
 
 
 if __name__ == '__main__':
-    chetflix_main()
+    create_netflix_dataset_main()

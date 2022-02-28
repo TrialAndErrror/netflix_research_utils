@@ -4,7 +4,6 @@ from pathlib import Path
 
 from src.compile import pd
 
-from src.compile.functions.clean_gt_data import merge_unogs_and_gt
 from src.compile.functions.clean_unogs_data import clean_unogs, melt_grouped_df
 from src.compile.functions.make_groups import perform_make_exclusive
 
@@ -67,27 +66,16 @@ def new_clean_col_names(final_df):
     return final_df[final_columns]
 
 
-def merge_with_gt(df, gt_data, df_path):
-
-    if not df_path.exists():
-        result = merge_unogs_and_gt(df, gt_data)
-        result.to_csv()
-    else:
-        result = pd.read_csv(df_path)
-    result = merge_unogs_and_gt(df, gt_data)
-
-    return result
-
-
-def merge_grouped_and_google_trends(grouped_df, gt_data, parts_path):
-    return merge_with_gt(grouped_df, gt_data, Path(parts_path, '[p]unogs_and_gt.csv'))
-
-#
-# def merge_unogs_and_google_trends(unogs_df, gt_data, parts_path):
-#     return merge_with_gt(unogs_df, gt_data, Path(parts_path, '[p]unogs_and_gt.csv'))
-
-
 def load_or_create_unogs_df(nf_originals, file_path, parts_path):
+    original_languages_to_replace = {
+            'Brazilian Portuguese': 'Portuguese',
+            'Mandarin (Putonghua)': 'Mandarin',
+            'European Spanish': 'Spanish',
+            'Mandarin (Guoyu)': 'Mandarin',
+            'English (India)': 'English',
+            'Arabic (Lebanon)': 'Arabic'
+        }
+
     nf_slugs = [item['slug'] for item in nf_originals]
 
     print('\nLoading UNOGS Data')
@@ -117,6 +105,8 @@ def load_or_create_unogs_df(nf_originals, file_path, parts_path):
         melted_df = melted_df[
             ['title', 'Original Language', 'Country', 'Group', 'Group Value', 'Language', 'slug']
         ]
+
+        melted_df['Original Language'] = melted_df['Original Language'].replace(original_languages_to_replace)
         melted_df.to_csv(melted_df_path)
     else:
         melted_df = pd.read_csv(melted_df_path, dtype={

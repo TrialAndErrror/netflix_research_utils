@@ -45,6 +45,10 @@ ALL_COUNTRIES = [
     'United States'
 ]
 
+ORIGINAL_LANGUAGE_REPLACE_DICT = {
+    'British English': 'English'
+}
+
 
 class PickleReader:
     def __init__(self, path: Path):
@@ -120,7 +124,7 @@ class PickleReader:
         for country, lang_dict in self.language_data.items():
             entry = dict()
             entry['title'] = self.title
-            entry['Original Language'] = self.original_language
+            entry['Original Language'] = replace_original_language(self.original_language)
             entry['Country'] = country
 
             for column in sub_columns:
@@ -133,8 +137,6 @@ class PickleReader:
 
             entry_list.append(entry)
 
-        if len(entry_list) < 38:
-            breakpoint()
         return entry_list
 
     def __repr__(self):
@@ -231,7 +233,7 @@ def split_subs_and_dubs(data_dict: dict, lang_type: str) -> dict:
     return results
 
 
-def get_original_language(dub_dict):
+def get_original_language(dub_dict) -> str:
     """
     Iterate over dubbing dictionary until original language is found.
 
@@ -244,3 +246,7 @@ def get_original_language(dub_dict):
         for entry in lang_list:
             if entry.strip().endswith('[Original]'):
                 return entry.split('[')[-2].strip()
+
+
+def replace_original_language(original_language: str) -> str:
+    return ORIGINAL_LANGUAGE_REPLACE_DICT.get(original_language, original_language)
