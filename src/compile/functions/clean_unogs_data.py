@@ -3,38 +3,38 @@ import re
 from src.compile import pd
 
 REMOVE_LIST = [
-        'Unnamed: 0',
-        'Unnamed: 0.1',
-        'dub_Pol',
-        'dub_Hin',
-        'dub_Ar',
-        'dub_Po',
-        'dub_Ita',
-        'dub_Itali',
-        'dub_Spanish -',
-        'dub_Br',
-        'dub_I',
-        'dub_Spani',
+    'Unnamed: 0',
+    'Unnamed: 0.1',
+    'dub_Pol',
+    'dub_Hin',
+    'dub_Ar',
+    'dub_Po',
+    'dub_Ita',
+    'dub_Itali',
+    'dub_Spanish -',
+    'dub_Br',
+    'dub_I',
+    'dub_Spani',
 ]
 
 MANUAL_REMOVAL = [
-        'dub_European Spanish [English-Delayed]',
-        'dub_Polish - Dubbing',
-        'dub_English [Hindi-Delayed]',
-        'dub_European Spanish [English-Pending]',
-        'dub_Brazilian Portuguese [English-Pending]',
-        'dub_Hindi [English-Delayed]',
-        'dub_Japanese [English-Delayed]',
-        'dub_Hindi [English-Pending]',
-        'dub_I',
-        'dub_Polish -',
-        'dub_Br',
-        'dub_European Spanish - Dubbed',
-        'dub_Brazilian Portuguese [English-Delayed]',
-        'dub_Brazilian Portugues',
-        'dub_Portugues',
-        'dub_Spanish -',
-        '',
+    'dub_European Spanish [English-Delayed]',
+    'dub_Polish - Dubbing',
+    'dub_English [Hindi-Delayed]',
+    'dub_European Spanish [English-Pending]',
+    'dub_Brazilian Portuguese [English-Pending]',
+    'dub_Hindi [English-Delayed]',
+    'dub_Japanese [English-Delayed]',
+    'dub_Hindi [English-Pending]',
+    'dub_I',
+    'dub_Polish -',
+    'dub_Br',
+    'dub_European Spanish - Dubbed',
+    'dub_Brazilian Portuguese [English-Delayed]',
+    'dub_Brazilian Portugues',
+    'dub_Portugues',
+    'dub_Spanish -',
+    '',
 ]
 
 REPLACE_DICT = {
@@ -59,8 +59,7 @@ REPLACE_DICT = {
     'dub_Polish - Lektor': 'dub_Polish',
     'dub_Mexican Spanish': 'dub_Spanish',
     'dub_Brazilian': 'dub_Portuguese',
-    'dub_Brazilian Portuguese': 'dub_Portuguese'
-
+    'dub_Brazilian Portuguese': 'dub_Portuguese',
 }
 
 
@@ -91,7 +90,7 @@ def remove_irrelevant_language_cols(mylist):
     """
     Remove irrelevant language columns, as indicated in R script.
     """
-    
+
     criteria = [
         '\[Original\]',
         'Undefined',
@@ -130,7 +129,7 @@ def replace_columns(df):
     def consolidate_column(row, replace_dict):
         for key, value in replace_dict.items():
             try:
-                row[value] = bool(row[key] or row[value])
+                row[value] = bool(row.get(key, False) or row.get(value, False))
             except KeyError:
                 pass
 
@@ -162,7 +161,4 @@ def melt_grouped_df(grouped_df) -> pd.DataFrame:
     melted_df = melted_df[
         ['title', 'Original Language', 'Country', 'Group', 'Language', 'Group Value', 'slug']]
 
-    melted_df_true_only = melted_df[melted_df['Group Value'] == True][
-        ['title', 'Original Language', 'Country', 'Group', 'Language', 'slug']
-    ]
     return melted_df

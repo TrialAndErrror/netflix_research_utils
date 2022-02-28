@@ -90,8 +90,6 @@ def prepare_dataframes_to_join(cleaned_movies_history):
             replace_indices_with_country(cleaned_movies_history)
         )
 
-    # clean_netflix_overall_df[['Points', 'ø/day']] = clean_netflix_overall_df[['Points', 'ø/day']].fillna(0)
-
     return clean_netflix_overall_df
 
 

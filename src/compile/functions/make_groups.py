@@ -78,7 +78,7 @@ def perform_make_exclusive(df):
     max_count = len(lang_list)
     count = 1
     for lang in lang_list:
-        print(f'({count}/{max_count})Grouping {lang}')
+        print(f'({count}/{max_count}) Grouping {lang}')
         df = df.apply(lambda x: set_exclusive_columns(x, language=lang), axis=1)
         count += 1
 

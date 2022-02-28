@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from src.won.xpaths import NEXT_BUTTON, get_row_xpath, EXPAND_BUTTON_CELL, get_title_cell, get_netflix_url_cell, \
     ENTRY_TABLE
 from src.won import get_output_filename, BASE_URL, log_error, log_debug, get_generic_filename
+from src.won.excluded_films import get_excluded_films
 from src.utils import write_json, read_json
 
 END_FLAG = False
@@ -199,8 +200,7 @@ def get_site_data():
     """
     Exclude any names from excluded_films json.
     """
-    excluded_names = read_json(Path(os.getcwd(), 'excluded_films.json'))
-    for name in excluded_names:
+    for name in get_excluded_films():
         movie_info.pop(name, None)
 
     write_json(movie_info, get_generic_filename())

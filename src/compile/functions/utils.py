@@ -38,6 +38,17 @@ def create_output_folder():
     return output_folder
 
 
+def merge_chinese_columns(language_col):
+    replace_dict = {
+        'sub_Traditional Chinese': 'sub_Cantonese (Traditional)',
+        'sub_Simplified Chinese': 'sub_Mandarin (Simplified)',
+        'dub_Cantonese': 'dub_Cantonese (Traditional)',
+        'dub_Mandarin': 'dub_Mandarin (Simplified)'
+    }
+
+    return language_col.replace(replace_dict)
+
+
 def new_clean_col_names(final_df):
     columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
     for col_name in columns_to_remove:
@@ -101,12 +112,9 @@ def load_or_create_unogs_df(nf_originals, file_path, parts_path):
     if not melted_df_path.exists():
         grp_col_list = ['title', 'Original Language', 'Country', 'slug']
         grp_col_list.extend([item for item in grouped_df.columns if item.startswith('grp')])
-        melted_df = melt_grouped_df(grouped_df[grp_col_list])
-        melted_df = melted_df[
-            ['title', 'Original Language', 'Country', 'Group', 'Group Value', 'Language', 'slug']
-        ]
 
-        melted_df['Original Language'] = melted_df['Original Language'].replace(original_languages_to_replace)
+        melted_df = melt_grouped_df(grouped_df[grp_col_list])
+        melted_df = clean_after_melt(melted_df, original_languages_to_replace)
         melted_df.to_csv(melted_df_path)
     else:
         melted_df = pd.read_csv(melted_df_path, dtype={
@@ -115,4 +123,14 @@ def load_or_create_unogs_df(nf_originals, file_path, parts_path):
             'Language': 'category'
         })
 
+    return melted_df
+
+
+def clean_after_melt(melted_df, original_languages_to_replace):
+    melted_df = melted_df[
+        ['title', 'Original Language', 'Country', 'Group', 'Group Value', 'Language', 'slug']
+    ]
+    melted_df['Language'] = merge_chinese_columns(melted_df['Language'])
+    melted_df['Original Language'] = merge_chinese_columns(melted_df['Original Language'])
+    melted_df['Original Language'] = melted_df['Original Language'].replace(original_languages_to_replace)
     return melted_df
