@@ -130,7 +130,5 @@ def clean_after_melt(melted_df, original_languages_to_replace):
     melted_df = melted_df[
         ['title', 'Original Language', 'Country', 'Group', 'Group Value', 'Language', 'slug']
     ]
-    melted_df['Language'] = merge_chinese_columns(melted_df['Language'])
-    melted_df['Original Language'] = merge_chinese_columns(melted_df['Original Language'])
     melted_df['Original Language'] = melted_df['Original Language'].replace(original_languages_to_replace)
     return melted_df

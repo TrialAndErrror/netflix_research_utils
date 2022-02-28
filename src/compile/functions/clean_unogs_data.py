@@ -139,7 +139,17 @@ def replace_columns(df):
         sub_df = df.drop(languages_to_drop, axis=1, errors='ignore')
         return sub_df
 
-    return consolidate_all_columns(df)
+    def replace_china_columns(df):
+        df['sub_Mandarin (Simplified)'] = df.pop('sub_Simplified Chinese')
+        df['dub_Mandarin (Simplified)'] = df.pop('dub_Mandarin')
+        df['sub_Cantonese (Traditional)'] = df.pop('sub_Traditional Chinese')
+        df['dub_Cantonese (Traditional)'] = df.pop('dub_Cantonese')
+        return df
+
+    pass_1 = consolidate_all_columns(df)
+    result_df = replace_china_columns(pass_1)
+
+    return result_df
 
 
 def clean_unogs(unogs_df: pd.DataFrame) -> pd.DataFrame:
