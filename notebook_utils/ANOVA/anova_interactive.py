@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from notebook_utils.anova_models import AnovaAnalysis
+from notebook_utils.ANOVA.anova_models import AnovaAnalysis
 import pandas as pd
 
 

@@ -84,8 +84,8 @@ def compile_main():
     """
     output_folder = create_output_folder()
     final_path = Path(output_folder, "final_full_dataset.csv")
-    print(f'\nSaving Final Dataframe to {final_path}')
-    final_df.to_csv(final_path)
+    # print(f'\nSaving Final Dataframe to {final_path}')
+    # final_df.to_csv(final_path)
 
     final_short_path = Path(output_folder, "final_short_dataset.csv")
     final_short_df = final_df[final_df['Group Value'] == True].drop(columns=['Group Value'])
@@ -100,6 +100,15 @@ def compile_main():
     for group, title_list in wiki_groups.items():
         group_df = final_short_df[final_short_df['title'].isin(title_list)]
         group_df.to_csv(Path(group_output_folder, f'Group Data - {group}.csv'))
+
+    """
+    Save dataframe of all films excluding those in the International Distribution group
+    """
+    distribution_titles = wiki_groups.get('Distribution', None)
+    if distribution_titles:
+        print('Saving Dataset Without Distribution Titles')
+        non_international_df = final_short_df[~final_short_df['title'].isin(distribution_titles)]
+        non_international_df.to_csv(Path(group_output_folder, f'Dataset Excluding Distribution Titles.csv'))
 
     print('Compile Complete.')
     return final_path
