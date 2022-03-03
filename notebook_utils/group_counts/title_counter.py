@@ -105,14 +105,18 @@ class GroupCounter:
         """
         Save JSON data files
         """
-        save_json(Path(self.output_path, f'{self.name}_row_counts.json'), self.rows_dict)
-        save_json(Path(self.output_path, f'{self.name}_title_counts.json'), self.titles_dict)
+        data_path = Path(self.output_path, 'data')
+        data_path.mkdir(exist_ok=True)
+        save_json(Path(data_path, f'{self.name}_row_counts.json'), self.rows_dict)
+        save_json(Path(data_path, f'{self.name}_title_counts.json'), self.titles_dict)
 
         """
         Save Excel Files
         """
-        save_split_excel(Path(self.output_path, f'{self.name}_rows_review_sheet.xlsx'), self.rows_dict)
-        save_split_excel(Path(self.output_path, f'{self.name}_titles_review_sheet.xlsx'), self.titles_dict)
+        excel_path = Path(self.output_path, 'excel')
+        excel_path.mkdir(exist_ok=True)
+        save_split_excel(Path(excel_path, f'{self.name}_rows_review_sheet.xlsx'), self.rows_dict)
+        save_split_excel(Path(excel_path, f'{self.name}_titles_review_sheet.xlsx'), self.titles_dict)
 
         print('Results Saved!')
 
