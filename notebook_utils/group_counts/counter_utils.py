@@ -35,4 +35,4 @@ def save_json(path: Path, data_dict: dict):
 
 
 def sort_list(data_list):
-    return sorted(data_list, key=lambda x: x[1], reverse=True)
+    return sorted(data_list, key=lambda x: x[0])
