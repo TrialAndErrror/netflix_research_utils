@@ -162,13 +162,20 @@ class PickleReader:
         return json.dumps(data_dict)
 
     def get_all_languages(self):
+        sub_replacement_languages = {
+            'sub_Cantonese': 'sub_Traditional Chinese',
+            'sub_Mandarin': 'sub_Simplified Chinese'
+        }
+
         dub_languages = []
         for language_list in self.dub_language_dict.values():
             dub_languages.extend([f'dub_{language}' for language in language_list])
-        sub_languages = []
 
+        sub_languages = []
         for language_list in self.sub_language_dict.values():
             sub_languages.extend([f'sub_{language}' for language in language_list])
+
+        sub_languages = [sub_replacement_languages.get(item, item) for item in sub_languages]
 
         all_languages = list(set(dub_languages + sub_languages))
 

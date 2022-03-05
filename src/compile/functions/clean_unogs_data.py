@@ -147,7 +147,24 @@ def replace_columns(df):
         return df
 
     pass_1 = consolidate_all_columns(df)
+
+    """
+    Use this option to leave original chinese langauge alone.
+    """
     result_df = replace_china_columns(pass_1)
+
+    """
+    Uncomment this to change original chinese languages to match the group names.
+    
+    def replace_chinese_original_languages(df):
+        df['Original Language'] = df['Original Language'].replace({
+            'Mandarin': 'Mandarin (Simplified)',
+            'Cantonese': 'Cantonese (Traditional)'
+        })
+        return df
+        
+    result_df = replace_chinese_original_languages(result_df)
+    """
 
     return result_df
 
