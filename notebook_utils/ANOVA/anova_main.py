@@ -58,14 +58,14 @@ def anova_main():
 
 def load_or_run_analysis(anova_model, country_name, df, image_out_path, language, pickle_out_path):
     pickle_path = Path(pickle_out_path, f'ANOVA_{language}_{country_name}.pickle')
+    current_analysis = AnovaAnalysis(df, country_name, language, anova_model, image_out_path)
+
     if not pickle_path.exists():
-
-        current_analysis = AnovaAnalysis(df, country_name, language, anova_model, image_out_path)
-
         results = current_analysis.run_analysis()
         save_pickle(results, pickle_path)
     else:
         results = load_pickle(pickle_path)
+
     return results, current_analysis.dataframe
 
 
