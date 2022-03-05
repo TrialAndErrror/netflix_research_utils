@@ -34,14 +34,15 @@ def anova_main():
     for country_name in countries:
         results_dict[country_name] = {}
         for language in languages:
-            results = load_or_run_analysis(anova_model, country_name, df, image_out_path, language, pickle_out_path)
+            results, last_df = load_or_run_analysis(anova_model, country_name, df, image_out_path, language, pickle_out_path)
 
             if not isinstance(results, str):
                 results_dict[country_name][language] = results
                 sig_results.append({'Country': country_name, 'Language': language})
                 results_counter += 1
             else:
-                results_dict[country_name] = results
+                results_dict[country_name]['error'] = results
+                results_dict[country_name]['dataframe'] = last_df.to_json()
                 break
 
     print(f'Found {results_counter} results.')
@@ -65,7 +66,7 @@ def load_or_run_analysis(anova_model, country_name, df, image_out_path, language
         save_pickle(results, pickle_path)
     else:
         results = load_pickle(pickle_path)
-    return results
+    return results, current_analysis.dataframe
 
 
 if __name__ == '__main__':
