@@ -64,50 +64,46 @@ class AnovaAnalysis:
     def run_analysis(self):
         print(f'Running Analysis: {self.language} in {self.country}\n\n')
         anova_filename = f'ANOVA_{self.language}_{self.country}.png'
-        if not Path(self.image_out_path, anova_filename).exists():
 
-            """
-            Perform ANOVA test
-            """
-            # anova_df = self.perform_one_way_anova()
-            try:
-                anova_df = self.perform_one_way_anova()
-            except ValueError as e:
-                message = f'Error when running ANOVA on {self.language} in {self.country}: {e}'
-                print(message)
-                return message
-            else:
-                print(anova_df)
-                dfi.export(anova_df, anova_filename)
-                shutil.move(anova_filename, Path(self.image_out_path, anova_filename))
-                if anova_df.iloc[0]['PR(>F)'] < .05:
-
-                    """
-                    Run Tukey Test for significant results
-                    """
-                    tukey_filename = f'TUKEY_{self.language}_{self.country}.png'
-                    try:
-                        tukey_test, tukey_obj = self.run_tukey_test('Group')
-                    except ValueError as e:
-                        message = f'Error when running Tukey Test on {self.language} in {self.country}: {e}'
-                        print(message)
-                        return message
-                    else:
-                        print(tukey_test)
-                        dfi.export(tukey_test, tukey_filename)
-                        shutil.move(tukey_filename, Path(self.image_out_path, tukey_filename))
-
-                        """
-                        Run Shapiro-Wilks test
-                        """
-
-                        shapiro = self.test_shapiro_wilk()
-                        print(shapiro)
-                        return tukey_test.to_json(), shapiro
-                else:
-                    print('\nNot significant, skipping tukey test')
+        """
+        Perform ANOVA test
+        """
+        try:
+            anova_df = self.perform_one_way_anova()
+        except ValueError as e:
+            message = f'Error when running ANOVA on {self.language} in {self.country}: {e}'
+            print(message)
+            return message
         else:
-            print('ANOVA file found, skipping running')
+            print(anova_df)
+            dfi.export(anova_df, anova_filename)
+            shutil.move(anova_filename, Path(self.image_out_path, anova_filename))
+            if anova_df.iloc[0]['PR(>F)'] < .05:
+
+                """
+                Run Tukey Test for significant results
+                """
+                tukey_filename = f'TUKEY_{self.language}_{self.country}.png'
+                try:
+                    tukey_test, tukey_obj = self.run_tukey_test('Group')
+                except ValueError as e:
+                    message = f'Error when running Tukey Test on {self.language} in {self.country}: {e}'
+                    print(message)
+                    return message
+                else:
+                    print(tukey_test)
+                    dfi.export(tukey_test, tukey_filename)
+                    shutil.move(tukey_filename, Path(self.image_out_path, tukey_filename))
+
+                    """
+                    Run Shapiro-Wilks test
+                    """
+
+                    shapiro = self.test_shapiro_wilk()
+                    print(shapiro)
+                    return tukey_test.to_json(), shapiro
+            else:
+                print('\nNot significant, skipping tukey test')
 
     def perform_one_way_anova(self):
         print(f'One-Way ANOVA: {self.language}')
@@ -122,7 +118,7 @@ class AnovaAnalysis:
     def test_shapiro_wilk(self):
         print(f'\n\nShapiro-Wilk Test: {self.language}')
         w, pvalue = stats.shapiro(self.res.anova_model_out.resid)
-        return f'W: {w}; P-Value: {pvalue}'
+        return {'W': w, 'P-Value': pvalue}
 
     def run_tukey_test(self, column_name):
         print(f'\n\nTukey Test: {self.language} [{column_name}]')
