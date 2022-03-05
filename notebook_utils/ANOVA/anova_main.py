@@ -64,6 +64,7 @@ def load_or_run_analysis(anova_model, country_name, df, image_out_path, language
         results = current_analysis.run_analysis()
         save_pickle(results, pickle_path)
     else:
+        print(f'Loading {language} in {country_name} from file')
         results = load_pickle(pickle_path)
 
     return results, current_analysis.dataframe
