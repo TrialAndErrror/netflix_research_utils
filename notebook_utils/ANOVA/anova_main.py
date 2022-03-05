@@ -42,7 +42,7 @@ def anova_main():
                 results_counter += 1
             else:
                 results_dict[country_name]['error'] = results
-                results_dict[country_name]['dataframe'] = last_df.to_json()
+                results_dict[country_name]['dataframe'] = last_df.to_dict('index')
                 break
 
     print(f'Found {results_counter} results.')

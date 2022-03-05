@@ -101,7 +101,7 @@ class AnovaAnalysis:
 
                     shapiro = self.test_shapiro_wilk()
                     print(shapiro)
-                    return tukey_test.to_json(), shapiro
+                    return tukey_test.to_dict('index'), shapiro
             else:
                 print('\nNot significant, skipping tukey test')
 
