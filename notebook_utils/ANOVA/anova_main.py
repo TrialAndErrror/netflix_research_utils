@@ -26,6 +26,7 @@ def anova_main():
 
     results_dict = {}
     results_counter = 0
+    sig_results = []
 
     for country_name in countries:
         results_dict[country_name] = {}
@@ -35,7 +36,9 @@ def anova_main():
             results = current_analysis.run_analysis()
             if results:
                 results_dict[country_name][language] = results
-                results_counter += 1
+                if not isinstance(results, str):
+                    sig_results.append({'Country': country_name, 'Language': language})
+                    results_counter += 1
 
     print(f'Found {results_counter} results.')
 
@@ -44,6 +47,9 @@ def anova_main():
         pickle.dump(results_dict, file)
 
     print(f'File saved as {out_path}')
+
+    sig_results_df = pd.DataFrame(columns=['Country', 'Language']).from_records(sig_results)
+    sig_results_df.to_csv(Path(output_folder, 'significant_results.csv'))
 
 
 if __name__ == '__main__':
