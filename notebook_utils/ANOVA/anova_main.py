@@ -25,32 +25,36 @@ def anova_main():
     countries = list(df.Country.unique())
     languages = list(df.Language.unique())
 
-    anova_model = 'trends_score ~ Group + Language'
+    anova_model = 'trends_score ~ Group'
 
     results_dict = {}
+    error_dict = {}
     results_counter = 0
     sig_results = []
 
     for country_name in countries:
         results_dict[country_name] = {}
+        error_dict[country_name] = {}
         for language in languages:
             results, last_df = load_or_run_analysis(anova_model, country_name, df, image_out_path, language, pickle_out_path)
-
             if not isinstance(results, str):
                 results_dict[country_name][language] = results
                 sig_results.append({'Country': country_name, 'Language': language})
                 results_counter += 1
             else:
-                results_dict[country_name]['error'] = results
-                results_dict[country_name]['dataframe'] = last_df.to_dict('index')
-                break
+                error_dict[country_name][language] = {}
+                error_dict[country_name][language]['error'] = results
+                error_dict[country_name][language]['dataframe'] = last_df.to_dict('index')
 
     print(f'Found {results_counter} results.')
 
-    out_path = Path(output_folder, 'anova_results.json')
-    write_json(results_dict, out_path)
+    results_out_path = Path(output_folder, 'anova_results.json')
+    write_json(results_dict, results_out_path)
 
-    print(f'File saved as {out_path}')
+    error_out_path = Path(output_folder, 'anova_errors.json')
+    write_json(error_dict, error_out_path)
+
+    print(f'File saved as {results_out_path}')
 
     sig_results_df = pd.DataFrame(columns=['Country', 'Language']).from_records(sig_results)
     sig_results_df.to_csv(Path(output_folder, 'significant_results.csv'))

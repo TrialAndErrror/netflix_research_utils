@@ -53,7 +53,7 @@ def test_shapiro_wilk(res):
 class AnovaAnalysis:
     def __init__(self, df: pd.DataFrame, country: str, language: str, anova_model, image_out_path: Path):
         self.res = stat()
-        self.dataframe = df[df.Country == country]
+        self.dataframe = df[(df.Country == country) & (df.Language == language)]
 
         self.anova_model = anova_model
         self.country = country
