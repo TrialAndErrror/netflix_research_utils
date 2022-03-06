@@ -36,7 +36,7 @@ def main(df):
         'neither_both',
         'sub_dub',
         'sub_both',
-        'dub_both'
+        'dub_both',
         # Negative Difference Values
         'sub_neither',
         'dub_neither',
@@ -55,11 +55,18 @@ def main(df):
                 sub_df = make_sub_df(country, language, language_data)
                 df_list.append(sub_df)
 
-    total_df = pd.concat(df_list)
+    total_df = pd.concat(df_list).set_index('Combination')
+
+    # if 'Unnamed: 0' in total_df.columns:
+    #     total_df = total_df.pop('Unnamed: 0')
 
     out_folder = Path(os.getcwd(), 'output')
     out_folder.mkdir(exist_ok=True)
-    total_df.to_csv(Path(out_folder, 'anova_results.csv'))
+
+    outfile_path = Path(out_folder, 'anova_results.csv')
+    total_df.to_csv(outfile_path)
+
+    return outfile_path
 
 
 def make_sub_df(country, language, language_data):

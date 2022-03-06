@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 import os
 from src.utils import write_json, save_pickle, load_pickle
-
+from notebook_utils.ANOVA.anova_to_df import main
 
 def anova_main():
     input_folder = Path(os.getcwd(), 'input')
@@ -28,7 +28,6 @@ def anova_main():
 
     results_dict = {}
     error_dict = {}
-    results_counter = 0
     sig_results = []
 
     for country_name in countries:
@@ -39,13 +38,12 @@ def anova_main():
             if not isinstance(results, str):
                 results_dict[country_name][language] = results
                 sig_results.append({'Country': country_name, 'Language': language})
-                results_counter += 1
             else:
                 error_dict[country_name][language] = {}
                 error_dict[country_name][language]['error'] = results
                 error_dict[country_name][language]['dataframe'] = last_df.to_dict('index')
 
-    print(f'Found {results_counter} results.')
+    print(f'Found {len(sig_results)} results.')
 
     results_out_path = Path(output_folder, 'anova_results.json')
     write_json(results_dict, results_out_path)
@@ -57,6 +55,9 @@ def anova_main():
 
     sig_results_df = pd.DataFrame(columns=['Country', 'Language']).from_records(sig_results)
     sig_results_df.to_csv(Path(output_folder, 'significant_results.csv'))
+
+    processed_path = main(results_dict)
+    print(f'ANOVA Results Processed and saved as {processed_path}')
 
 
 def load_or_run_analysis(anova_model, country_name, df, image_out_path, language, pickle_out_path):
