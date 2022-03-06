@@ -50,10 +50,10 @@ def main(df):
     df_list.append(master_df)
 
     for country, country_data in df.items():
-        if 'error' not in country_data:
-            for language, language_data in country_data.items():
-                    sub_df = make_sub_df(country, language, language_data)
-                    df_list.append(sub_df)
+        for language, language_data in country_data.items():
+            if language_data:
+                sub_df = make_sub_df(country, language, language_data)
+                df_list.append(sub_df)
 
     total_df = pd.concat(df_list)
 
@@ -63,7 +63,7 @@ def main(df):
 
 
 def make_sub_df(country, language, language_data):
-    sub_df = pd.DataFrame(json.loads(language_data[0]))
+    sub_df = pd.DataFrame(language_data[0]).T
     shapiro = language_data[1]
     sub_df['sig_group'] = sub_df.apply(lambda x: get_significance_groups(x), axis=1)
     sub_df['Combination'] = f'{country}_{language}'
