@@ -1,10 +1,9 @@
-import pickle
-
 from notebook_utils.ANOVA.anova_models import AnovaAnalysis
 import pandas as pd
 from pathlib import Path
 import os
 from src.utils import write_json, save_pickle, load_pickle
+
 
 def anova_main():
     input_folder = Path(os.getcwd(), 'input')
