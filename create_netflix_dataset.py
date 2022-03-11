@@ -40,7 +40,7 @@ def create_netflix_dataset_main():
         raise FileNotFoundError(f'Place Top 3 Languages Dataframe in {compile_folder}')
 
     """
-    Run WON Gatherer to get nf_dict.json
+    Run What's On Netflix Gatherer to get list of Netflix Original titles
 
     (If the nf_dict already exists, then allow to skip)
 

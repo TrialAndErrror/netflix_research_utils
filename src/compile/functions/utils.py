@@ -33,7 +33,7 @@ def check_for_required_files():
 
 
 def create_output_folder():
-    output_folder = Path(os.getcwd(), 'output', f'Compile Results: {datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}')
+    output_folder = Path(os.getcwd(), 'output', f'Compile Results {datetime.now().strftime("%m-%d-%Y_%H-%M-%S")}')
     output_folder.mkdir(exist_ok=True, parents=True)
     return output_folder
 
