@@ -91,7 +91,7 @@ def make_country_dfs(nf_dict):
     """
     Load History pickles.
     """
-    print('Working on Languages')
+    print('Working on Countries')
     country_dict = {}
 
     pickle_file_list = [f'{item["slug"]}' for item in nf_dict]

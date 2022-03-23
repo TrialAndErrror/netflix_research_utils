@@ -19,13 +19,24 @@ df_structure = {
 
 
 def get_significance_groups(row):
+    """
+    Return whether the
+
+    :param row:
+    :return:
+    """
+
+    """
+    First group in group name is the one that has a higher mean.
+    """
+
     if row['Diff'] >= 0:
         return f'{row["group1"]}_{row["group2"]}'
     else:
         return f'{row["group2"]}_{row["group1"]}'
 
 
-def main(df):
+def main(df, prefix):
     master_df = pd.DataFrame(columns=[
         'Country',
         'Language',
@@ -63,7 +74,7 @@ def main(df):
     out_folder = Path(os.getcwd(), 'output')
     out_folder.mkdir(exist_ok=True)
 
-    outfile_path = Path(out_folder, 'anova_results.csv')
+    outfile_path = Path(out_folder, f'{prefix}_anova_results.csv')
     total_df.to_csv(outfile_path)
 
     return outfile_path
@@ -83,4 +94,4 @@ def make_sub_df(country, language, language_data):
 
 if __name__ == '__main__':
     data = read_json(Path('/home/wade/PycharmProjects/chetflix/notebook_utils/ANOVA/output/anova_results.json'))
-    main(data)
+    main(data, prefix='test')
