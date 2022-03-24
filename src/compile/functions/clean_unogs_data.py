@@ -76,7 +76,7 @@ def find_and_remove_pattern(pattern, mylist):
     return [item for item in mylist if item not in matches]
 
 
-def remove_season_columns(mylist):
+def remove_audio_description_columns(mylist):
     """
     Remove Audio Description columns by looking for - A pattern
     
@@ -114,7 +114,7 @@ def remove_specific_columns(mylist):
 
 def perform_all_cleaning(col_list):
     operations = [
-        remove_season_columns,
+        remove_audio_description_columns,
         remove_irrelevant_language_cols,
         remove_specific_columns,
     ]
