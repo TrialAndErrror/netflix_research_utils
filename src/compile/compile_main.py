@@ -83,7 +83,7 @@ def compile_main():
     Save Final Results
     """
     output_folder = create_output_folder()
-    final_path = Path(output_folder, "final_full_dataset.csv")
+    # final_path = Path(output_folder, "final_full_dataset.csv")
     # print(f'\nSaving Final Dataframe to {final_path}')
     # final_df.to_csv(final_path)
 
@@ -111,7 +111,7 @@ def compile_main():
         non_international_df.to_csv(Path(group_output_folder, f'Dataset Excluding Distribution Titles.csv'))
 
     print('Compile Complete.')
-    return final_path
+    return final_short_path
 
 
 if __name__ == '__main__':
