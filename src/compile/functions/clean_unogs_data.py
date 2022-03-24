@@ -133,13 +133,13 @@ def replace_columns(df):
             except KeyError:
                 pass
 
-    def consolidate_all_columns(df):
+    def consolidate_all_columns(df: pd.DataFrame):
         df.apply(lambda x: consolidate_column(x, REPLACE_DICT), axis=1)
         languages_to_drop = list(REPLACE_DICT.keys())
         sub_df = df.drop(languages_to_drop, axis=1, errors='ignore')
         return sub_df
 
-    def replace_china_columns(df):
+    def replace_china_columns(df: pd.DataFrame):
         df['sub_Mandarin (Simplified)'] = df.pop('sub_Simplified Chinese')
         df['dub_Mandarin (Simplified)'] = df.pop('dub_Mandarin')
         df['sub_Cantonese (Traditional)'] = df.pop('sub_Traditional Chinese')

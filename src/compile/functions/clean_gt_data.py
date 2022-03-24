@@ -1,5 +1,6 @@
 from src.compile import pd
 
+
 def get_gt_column(row):
     country = row['Country']
     gt_data = row.get(f'gt_{country}')

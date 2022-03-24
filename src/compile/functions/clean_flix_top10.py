@@ -69,17 +69,6 @@ def replace_indices_with_country(flix_dict):
     return results
 
 
-def reform_dict(target_dict):
-    results = {}
-
-    for outerkey, innerdict in target_dict.items():
-        if innerdict:
-            for innerkey, values in innerdict.items():
-                results[(outerkey, innerkey)] = values
-
-    return results
-
-
 def make_into_dataframe(target_dict):
     df = pd.DataFrame.from_dict(target_dict, orient="index").stack().to_frame()
     return pd.DataFrame(df[0].values.tolist(), index=df.index)
