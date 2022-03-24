@@ -38,17 +38,6 @@ def create_output_folder():
     return output_folder
 
 
-# def merge_chinese_columns(language_col):
-#     replace_dict = {
-#         'sub_Traditional Chinese': 'sub_Cantonese (Traditional)',
-#         'sub_Simplified Chinese': 'sub_Mandarin (Simplified)',
-#         'dub_Cantonese': 'dub_Cantonese (Traditional)',
-#         'dub_Mandarin': 'dub_Mandarin (Simplified)'
-#     }
-#
-#     return language_col.replace(replace_dict)
-
-
 def new_clean_col_names(final_df):
     columns_to_remove = ['Unnamed: 0', 'level_0', 'level_1']
     for col_name in columns_to_remove:
